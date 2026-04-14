@@ -2,50 +2,51 @@ export const copy = {
   site: {
     name: "拾象科技",
     nameEn: "Shixiang Tech",
+    tagline: "Research first.",
+    description:
+      "拾象是一家研究驱动的科技投资基金。Research the curve. Bet the decade.",
     url: "https://shixiang.tech",
   },
   nav: {
-    about: "关于",
+    reports: "AGI Reports",
+    insights: "Explore Insights",
   },
   hero: {
-    slogan: "拾象是一家研究驱动的科技投资基金。",
+    eyebrow: "Research the curve. Bet the decade.",
+    headline: "Research first.",
+    subline: "推动科技大航海。",
+    cta: "Get Our Latest Research  →",
+    updatedLabel: "Updated",
   },
-  latestDeck: {
-    sectionTitle: "最新研究",
-    viewFullCta: "查看完整报告",
+  focusGrid: {
+    items: ["AGI Labs", "Robotics", "AI for Science", "Agent-Native"] as const,
   },
-  pastDecks: {
-    sectionTitle: "过往报告",
+  reportsList: {
+    featuredEyebrow: "LATEST REPORT",
+    featuredCta: "View full report →",
   },
-  externalContent: {
-    sectionTitle: "持续关注",
-    wechatLabel: "扫码关注海外独角兽",
-    wechatDescription: "每周更新科技行业深度研究",
-    substackLabel: "订阅 English Newsletter",
-    substackDescription: "Subscribe to our research in English",
-    substackCta: "Subscribe",
-    substackUrl: "https://haiwaiguijiao.substack.com",
+  reportDetail: {
+    back: "← Back to Reports",
+    shareTitle: "SHARE THIS REPORT",
+    shareWechat: "微信",
+    shareTwitter: "X",
+    shareCopyLink: "Copy link",
+    shareCopied: "已复制",
+    docsendPlaceholder: "DocSend embed iframe (placeholder)",
   },
-  about: {
-    title: "关于拾象",
-    paragraphs: [
-      "[占位符段落 1：拾象的核心定位与研究方法论]",
-      "[占位符段落 2：拾象关注的领域与投资理念]",
-    ],
-    contactCta: "如有合作意向，请联系我们",
-    contactEmail: "contact@shixiang.tech",
+  wechatModal: {
+    label: "WECHAT",
+    title: "关注海外独角兽公众号",
+    hint: "扫一扫二维码，获取前沿研究",
+    close: "关闭",
   },
   footer: {
-    copyright: `© ${new Date().getFullYear()} 拾象科技`,
-    contactLabel: "联系我们",
-    contactEmail: "contact@shixiang.tech",
-  },
-  deckDetail: {
-    backToHome: "返回首页",
-    share: "分享",
-    shareWechat: "微信",
-    shareTwitter: "Twitter",
-    shareCopyLink: "复制链接",
-    shareCopied: "已复制",
+    contactLabel: "CONTACT",
+    contactEmail: "investment@shixiangcap.com",
+    officesLabel: "OFFICES",
+    offices: "Beijing  ·  Shanghai  ·  Hong Kong",
+    wechatLabel: "WECHAT",
+    wechatHandle: "@海外独角兽",
+    copyright: `© ${new Date().getFullYear()}  SHIXIANG TECH  ·  拾象科技`,
   },
 } as const;

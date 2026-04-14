@@ -8,46 +8,47 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        // TODO: 部署时替换为 Google Fonts（Inter + Noto Sans SC）
-        // 本地开发用系统字体栈，因为 fonts.gstatic.com 有网络限制
         sans: [
+          "Inter",
+          "'Noto Sans SC'",
           "system-ui",
           "-apple-system",
-          "BlinkMacSystemFont",
-          "'Segoe UI'",
           "'PingFang SC'",
           "'Hiragino Sans GB'",
           "'Microsoft YaHei'",
           "sans-serif",
         ],
+        serif: [
+          "'EB Garamond'",
+          "'Noto Serif SC'",
+          "Georgia",
+          "Cambria",
+          "'Times New Roman'",
+          "serif",
+        ],
+        display: [
+          "'Epunda Sans'",
+          "Inter",
+          "system-ui",
+          "sans-serif",
+        ],
       },
       colors: {
-        crimson: {
-          50: "#FDF2F3",
-          100: "#FCE4E6",
-          200: "#F9CDD0",
-          300: "#F3A3A9",
-          400: "#EA6E77",
-          500: "#DC4450",
-          600: "#A11F2A",
-          700: "#8B1B25",
-          800: "#741A22",
-          900: "#621A20",
-          950: "#360B10",
-        },
-        quantum: {
-          50: "#F7F7F8",
-          100: "#EDEDEE",
-          200: "#D4D4D6",
-          300: "#B0B0B4",
-          400: "#8A8A90",
-          500: "#6B6B72",
-          600: "#53535A",
-          700: "#3E3E44",
-          800: "#2A2A2F",
-          900: "#1E1E23",
-          950: "#17171C",
-        },
+        // Brand
+        crimson: "#A11F2A",
+        // Surfaces
+        cream: "#FAFAF7",
+        rule: "#D8D6CF",
+        // Text
+        ink: "#17171C",
+        muted: "#5A5A60",
+        meta: "#9A9A9F",
+        // Featured card dark background (reports list)
+        obsidian: "#1C0607",
+      },
+      letterSpacing: {
+        eyebrow: "1.12px",
+        label: "1.1px",
       },
     },
   },

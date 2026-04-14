@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "nextdev",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeExecutable": "/opt/homebrew/bin/npx",
+      "runtimeArgs": ["next", "dev"],
       "port": 3000
     }
   ]

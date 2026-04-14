@@ -5,8 +5,8 @@ import { copy } from "@/content/copy";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: copy.site.name,
-  description: copy.hero.slogan,
+  title: `${copy.site.name} · ${copy.site.tagline}`,
+  description: copy.site.description,
 };
 
 export default function RootLayout({
@@ -16,7 +16,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN">
-      <body className="font-sans antialiased text-quantum-950 bg-white">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Epunda+Sans:wght@400;500&family=Inter:wght@400;500&family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@400;500&display=swap"
+        />
+      </head>
+      <body className="font-sans antialiased text-ink bg-cream">
         <Header />
         <main className="pt-[50px] min-h-screen">{children}</main>
         <Footer />

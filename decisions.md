@@ -68,3 +68,150 @@ Logo 文件为 PNG 格式（5033x1598 分辨率），使用映射：
 | `logo-horizontal-brand.png` | 强化品牌识别的特殊场景 |
 | `logo-vertical-black.png` | OG 图、favicon 基础 |
 | `logo-vertical-brand.png` | 竖版品牌色场景 |
+
+---
+
+## 2026-04-14: 技术架构定稿
+
+### 决策
+- **框架**：Next.js 14（App Router）+ TypeScript + React Server Components
+- **样式**：Tailwind CSS（自定义 tokens，不引第三方 UI 库）
+- **渲染**：SSG（`generateStaticParams` 为每份 deck 生成静态 HTML）
+- **部署**：Vercel（push to `main` 自动部署）
+- **数据层当前**：本地 `content/decks.ts`（TypeScript 常量）
+- **数据层目标**：飞书多维表格（Lark Base）—— Phase D 切换
+
+### 原因
+Next.js + Vercel 是轻量静态站的工业标准，部署 0 配置，SSG 性能最佳。Tailwind 保证设计 token 单一来源。
+
+---
+
+## 2026-04-14: 内容分发 — 全面用 DocSend
+
+### 决策
+所有 deck 展示、邮箱解锁、访问追踪统一走 **DocSend**（已确认拾象持有 DocSend Spaces 套餐，支持 iframe embed）。
+
+### 配置约定（每份 deck）
+| DocSend Link Setting | 值 |
+|---|---|
+| Require email | 由 DocSend 统一收集，不要在我们站上自建表单 |
+| Allow embedding | **必须 ON** |
+| Expiration | Never（除非是限时 deck） |
+
+站上展示方式：`<DocSendEmbed url={deck.docsendUrl} />` 直接 iframe，4:3 比例。
+
+---
+
+## 2026-04-14: CMS 方案 — 待定
+
+### 现状
+飞书多维表格 `SX Website Deck`（token: `Fx8Xbk8w9aIAy1sbPkzcOliBnse`）已创建并配好 13 个字段。但**是否最终用飞书 Base 做 CMS 尚未拍板**。
+
+### 候选方案
+| 方案 | 优点 | 缺点 |
+|---|---|---|
+| **飞书多维表格**（当前）| 团队已在用，无额外账号；字段已建好 | API 调用需 tenant_access_token，build-time 拉数据增加复杂度 |
+| **Notion**（候选）| 富文本编辑体验好；Notion API 稳定且文档完善 | 团队不一定在用，多一套账号 |
+
+### 下一步
+明天或后续决定。当前代码用本地 `content/decks.ts`，切换任一方案只需改一个数据拉取层。
+
+---
+
+## 2026-04-14: 视觉设计定稿
+
+### 核心方向
+**米白背景 + 衬线英文 + 黑体中文 + 克制的拾象红作为 accent**
+
+气质参考：Coatue Perspectives、Sequoia 投研文章页。
+
+### Design Tokens
+| Token | Hex | 用途 |
+|---|---|---|
+| `cream` | `#FAFAF7` | 页面背景 |
+| `rule` | `#D8D6CF` | 分隔线、二级按钮文字 |
+| `ink` | `#17171C` | 主文字 |
+| `muted` | `#5A5A60` | 副标题、次级文字 |
+| `meta` | `#9A9A9F` | Meta 信息、copyright |
+| `crimson` | `#A11F2A` | 品牌红（eyebrow、CTA 下划线、Focus grid 分隔、AGI REPORTS 按钮） |
+| `obsidian` | `#1C0607` | 列表页 featured card 深酒红底 |
+
+### 字体
+| 字体 | 场景 | 来源 |
+|---|---|---|
+| **EB Garamond** | 所有英文大标题（Hero 96px、列表 featured 56px、详情页 64px、焦点 22px、邮箱 18px） | Google Fonts |
+| **Epunda Sans** | Eyebrow（`RESEARCH THE CURVE. BET THE DECADE.`） | Google Fonts |
+| **Inter** | Nav、CTA、meta、body、copyright | Google Fonts |
+| **Noto Sans SC** | 所有中文正文 | Google Fonts |
+| **Noto Serif SC** | 中文衬线（暂未使用，预留） | Google Fonts |
+
+**英文字体决定**：统一用 Inter（UI）+ EB Garamond（展示），放弃 GT Sectra（付费字体，气质近但授权成本高）。
+
+**中文字体决定**：当前用 Noto Sans SC（思源黑体）。未来若想调整中文衬线气质，候选是 Noto Serif SC（思源宋体）—— 待评估。
+
+---
+
+## 2026-04-14: 页面结构定稿
+
+### 首页 `/`
+1. 固定 50px Nav（logo + AGI REPORTS 红按钮 + Explore Insights）
+2. Hero：
+   - Eyebrow：`RESEARCH THE CURVE. BET THE DECADE.`（红色，大写，Epunda Sans 14px，tracking 1.12px）
+   - Headline：`Research first.`（EB Garamond 96px，negative tracking）
+   - Subline：`推动科技大航海。`（52px，灰色 `muted`）
+   - CTA：`Get Our Latest Research →`（下划线 crimson）+ `Updated April 2026`（灰 meta）
+3. Focus Grid：4 个领域 tags（AGI Labs / Robotics / AI for Science / Agent-Native），crimson 分隔线
+4. 三栏 Footer
+
+### Reports 列表页 `/reports`
+左右分栏（desktop 2:3）：
+- 左：深酒红（`obsidian`）大卡片，sticky，展示 featured deck（eyebrow quarter + 白色衬线大标题 + 中文副标题 + View full report CTA）
+- 右：纯文字列表（`divide-y`），每条：quarter 小字 → 衬线标题 → 中文副标题
+
+参考 Coatue Perspectives 的左右分栏信息密度。
+
+### Reports 详情页 `/reports/[slug]`
+1. 50px Nav
+2. `← Back to Reports`
+3. 月份 eyebrow（红色）
+4. 衬线大标题（64px）
+5. Meta 行：`By 拾象投研团队 · XX pages · XX min read`
+6. DocSend iframe（受限宽度，保留两侧留白，4:3 比例）
+7. Share bar：`微信 | X | Copy link`
+8. 三栏 Footer
+
+**关于 Continue reading**：Figma 最新稿里移除了，保留数据层 `getRelatedDecks` 函数以备后续启用。
+
+---
+
+## 2026-04-14: 今天放弃的方案（记录以防反复）
+
+| 方案 | 放弃原因 |
+|---|---|
+| 自建 PDF 翻页器 `<DeckViewer>` | DocSend 已原生提供，造轮子成本不划算 |
+| Supabase 邮箱池 | DocSend 内置邮箱解锁，不需要 |
+| Resend 邮件通知 | 同上，DocSend 通知链路已解决 |
+| Google Drive 分发 deck | 无访问追踪、权限管理差 |
+| 腾讯文档分发 deck | 国际化阅读体验差，无 embed |
+| 飞书 API build 时自动建表 | 开发阶段手工建表反而更快，表结构变动少 |
+
+---
+
+## 2026-04-14: 交互细节约定
+
+- **Explore Insights** 点击：**不跳页**，弹居中 modal 显示 `/public/images/wechat-qr.jpg` + `关注海外独角兽公众号` 文字；关闭方式：点蒙层 / ESC / 右上角 ✕
+- **Focus Grid 4 个 tags**：**纯展示，不可点**（一期 scope 内无分类筛选页）
+- **"Get Our Latest Research →"**：链接到 `/reports/[featuredDeck.slug]`，也就是 `featured=true` 且 `status=published` 的那份 deck 的详情页
+- **同一时刻 `featured=true` 只能有一份**（人工约定，无系统校验）
+- **Slug 命名规则**：`[主题]-[年份]-q[季度]`，小写，连字符连接，不含中文/空格/标点。示例：`ai-agents-2026-q1`。发布后不可改（改了会 404）。
+
+---
+
+## 2026-04-14: 下一阶段规划
+
+参考 `progress.md` 的 "明天的工作顺序" 章节。顺序不可颠倒：
+1. 修 Node v22 LTS
+2. 迁仓库到新 GitHub 账号
+3. Vercel 重新导入
+4. 首页调优 + 最终上线
+

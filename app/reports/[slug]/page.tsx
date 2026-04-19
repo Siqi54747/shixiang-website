@@ -53,11 +53,28 @@ export default function ReportDetailPage({ params }: Params) {
 
       <p className="mt-3 text-[14px] text-muted">{meta}</p>
 
-      <div className="mt-6 flex flex-col lg:flex-row lg:items-start gap-8 lg:gap-10">
-        <div className="lg:flex-1 min-w-0">
+      <div className="mt-6 flex flex-col lg:flex-row lg:items-start gap-8 lg:gap-12">
+        <div className="shrink-0">
           <DeckEmbed url={deck.embedUrl} title={deck.title} />
         </div>
-        <aside className="lg:w-[140px] lg:pt-2 shrink-0">
+        <aside className="lg:flex-1 min-w-0 flex flex-col gap-8">
+          <section className="flex flex-col gap-4">
+            <p className="text-[11px] tracking-label uppercase text-meta">
+              {copy.reportDetail.introTitle}
+            </p>
+            {deck.intro && deck.intro.length > 0 ? (
+              <div className="flex flex-col gap-3 text-[15px] leading-[1.7] text-ink">
+                {deck.intro.map((para, i) => (
+                  <p key={i}>{para}</p>
+                ))}
+              </div>
+            ) : (
+              <p className="text-[14px] text-meta italic">
+                {copy.reportDetail.introPlaceholder}
+              </p>
+            )}
+          </section>
+
           <ShareBar title={deck.title} />
         </aside>
       </div>

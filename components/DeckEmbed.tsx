@@ -14,19 +14,21 @@ interface DeckEmbedProps {
  *
  * An empty `url` renders a placeholder block.
  *
- * Sizing: fills parent container width; height fixed at 70vh. We no
- * longer enforce a 4:3 aspect ratio — the underlying Google Drive
- * preview player responsively letterboxes the PDF to fit whatever
- * iframe dimensions we give it, so a wider iframe (up to the available
- * column width on desktop) just produces a cleaner fit with less
- * horizontal whitespace next to the share rail.
+ * Sizing: height capped at 70vh, width reverse-computed to preserve
+ * the 4:3 ratio the underlying deck is authored in. `max-width: 100%`
+ * keeps it safe on narrow parents. No `mx-auto` — callers decide
+ * alignment; on report detail the iframe sits left-aligned next to
+ * the title column and the reading-guide column fills the right side.
  */
 export function DeckEmbed({ url, title }: DeckEmbedProps) {
   if (!url) {
     return (
       <div
-        className="w-full border border-rule bg-cream flex items-center justify-center text-meta text-sm"
-        style={{ height: "70vh" }}
+        className="border border-rule bg-cream flex items-center justify-center text-meta text-sm"
+        style={{
+          width: "min(100%, calc(70vh * 4 / 3))",
+          aspectRatio: "4 / 3",
+        }}
       >
         {copy.reportDetail.embedPlaceholder}
       </div>
@@ -35,8 +37,11 @@ export function DeckEmbed({ url, title }: DeckEmbedProps) {
 
   return (
     <div
-      className="w-full border border-rule bg-white overflow-hidden"
-      style={{ height: "70vh" }}
+      className="border border-rule bg-white overflow-hidden"
+      style={{
+        width: "min(100%, calc(70vh * 4 / 3))",
+        aspectRatio: "4 / 3",
+      }}
     >
       <iframe
         src={url}

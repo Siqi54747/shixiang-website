@@ -27,6 +27,8 @@ export const copy = {
   },
   reportDetail: {
     back: "← Back to Reports",
+    introTitle: "READING GUIDE",
+    introPlaceholder: "导读内容即将发布。",
     shareTitle: "SHARE THIS REPORT",
     shareWechat: "微信",
     shareTwitter: "X",

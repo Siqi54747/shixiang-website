@@ -11,6 +11,7 @@ export interface Deck {
   featured: boolean;
   status: "draft" | "published";
   relatedSlugs?: string[];
+  intro?: string[];     // 右栏导读段落（运营产出），每段一个字符串；undefined = 显示占位文案
 }
 
 /**
@@ -30,6 +31,12 @@ export const decks: Deck[] = [
     summary: "全球 AGI 赛道全景梳理",
     featured: true,
     status: "published",
+    // PLACEHOLDER — 运营替换为真实导读内容。每个 string 一段。
+    intro: [
+      "这份报告梳理了 2026 年一季度全球 AGI 赛道的关键变化，覆盖 OpenAI、Anthropic、Google DeepMind 等头部实验室在模型、产品、组织三个维度的动向。",
+      "我们重点关注三条主线：Coding 能力加速向自主 Agent 演进、战略组织与文化如何决定第二增长曲线、智能通缩在下游应用层的兑现节奏。",
+      "数据截止 2026 年 3 月，覆盖样本超过 200 家公司。建议先看第 12–18 页的市场结构图和第 30–36 页的投资地图，再回头读完整论述。",
+    ],
   },
   {
     slug: "ai-agents-2025-q4",

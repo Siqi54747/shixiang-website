@@ -14,8 +14,11 @@ export function DocSendEmbed({ url, title }: DocSendEmbedProps) {
   if (!url) {
     return (
       <div
-        className="w-full border border-rule bg-cream flex items-center justify-center text-meta text-sm"
-        style={{ aspectRatio: "4 / 3" }}
+        className="mx-auto border border-rule bg-cream flex items-center justify-center text-meta text-sm"
+        style={{
+          width: "min(100%, calc(55vh * 4 / 3))",
+          aspectRatio: "4 / 3",
+        }}
       >
         {copy.reportDetail.docsendPlaceholder}
       </div>
@@ -24,8 +27,11 @@ export function DocSendEmbed({ url, title }: DocSendEmbedProps) {
 
   return (
     <div
-      className="w-full border border-rule bg-white overflow-hidden"
-      style={{ aspectRatio: "4 / 3" }}
+      className="mx-auto border border-rule bg-white overflow-hidden"
+      style={{
+        width: "min(100%, calc(55vh * 4 / 3))",
+        aspectRatio: "4 / 3",
+      }}
     >
       <iframe
         src={url}

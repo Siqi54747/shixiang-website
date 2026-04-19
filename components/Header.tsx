@@ -2,12 +2,15 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { copy } from "@/content/copy";
 import { WechatModal } from "./WechatModal";
 
 export function Header() {
   const [showWechat, setShowWechat] = useState(false);
+  const pathname = usePathname();
+  const onReports = pathname?.startsWith("/reports") ?? false;
 
   return (
     <>
@@ -25,7 +28,12 @@ export function Header() {
           <div className="flex items-center gap-6 md:gap-9">
             <Link
               href="/reports"
-              className="bg-crimson text-rule text-[14px] uppercase tracking-wide px-4 py-[4px] rounded-md hover:bg-[#8B1B25] transition-colors"
+              aria-current={onReports ? "page" : undefined}
+              className={
+                onReports
+                  ? "text-crimson text-[14px] uppercase tracking-wide border-b border-crimson pb-[2px]"
+                  : "bg-crimson text-rule text-[14px] uppercase tracking-wide px-4 py-[4px] rounded-md hover:bg-[#8B1B25] transition-colors"
+              }
             >
               {copy.nav.reports}
             </Link>

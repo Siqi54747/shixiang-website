@@ -8,16 +8,30 @@ interface ShareBarProps {
 }
 
 export function ShareBar({ title }: ShareBarProps) {
-  const [copied, setCopied] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
+  const [wechatToast, setWechatToast] = useState(false);
 
-  const handleCopy = async () => {
+  const copyLink = async () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
+      return true;
     } catch {
-      /* silently ignore */
+      return false;
     }
+  };
+
+  const handleCopyLink = async () => {
+    const ok = await copyLink();
+    if (!ok) return;
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 1800);
+  };
+
+  const handleWechat = async () => {
+    const ok = await copyLink();
+    if (!ok) return;
+    setWechatToast(true);
+    setTimeout(() => setWechatToast(false), 2400);
   };
 
   const handleTwitter = () => {
@@ -41,8 +55,7 @@ export function ShareBar({ title }: ShareBarProps) {
         <button
           type="button"
           className="hover:text-crimson transition-colors"
-          onClick={handleCopy}
-          aria-label="Copy WeChat link"
+          onClick={handleWechat}
         >
           {copy.reportDetail.shareWechat}
         </button>
@@ -58,11 +71,19 @@ export function ShareBar({ title }: ShareBarProps) {
         <button
           type="button"
           className="hover:text-crimson transition-colors"
-          onClick={handleCopy}
+          onClick={handleCopyLink}
         >
-          {copied ? copy.reportDetail.shareCopied : copy.reportDetail.shareCopyLink}
+          {linkCopied ? copy.reportDetail.shareCopied : copy.reportDetail.shareCopyLink}
         </button>
       </div>
+      <p
+        aria-live="polite"
+        className={`text-[12px] text-muted min-h-[18px] transition-opacity duration-200 ${
+          wechatToast ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        {copy.reportDetail.shareWechatToast}
+      </p>
     </div>
   );
 }

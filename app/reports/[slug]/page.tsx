@@ -35,7 +35,7 @@ export default function ReportDetailPage({ params }: Params) {
     : `By 拾象投研团队 · ${deck.pages} pages`;
 
   return (
-    <article className="px-6 md:px-24 py-8 md:py-12">
+    <article className="px-6 md:px-24 py-6 md:py-8">
       <Link
         href="/reports"
         className="inline-block text-[14px] text-ink hover:text-crimson transition-colors"
@@ -43,17 +43,17 @@ export default function ReportDetailPage({ params }: Params) {
         {copy.reportDetail.back}
       </Link>
 
-      <p className="mt-8 text-[14px] text-crimson font-medium tracking-wide">
+      <p className="mt-5 text-[14px] text-crimson font-medium tracking-wide">
         {formatMonthYear(deck.publishedDate)}
       </p>
 
-      <h1 className="font-serif text-[40px] md:text-[56px] lg:text-[64px] leading-[1.1] text-ink mt-2 md:mt-3">
+      <h1 className="font-serif text-[40px] md:text-[48px] lg:text-[56px] leading-[1.1] text-ink mt-2">
         {deck.title}
       </h1>
 
-      <p className="mt-5 text-[14px] text-muted">{meta}</p>
+      <p className="mt-3 text-[14px] text-muted">{meta}</p>
 
-      <div className="mt-10">
+      <div className="mt-6">
         <DocSendEmbed url={deck.docsendUrl} title={deck.title} />
       </div>
 

@@ -30,7 +30,7 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased text-ink bg-cream">
         <Header />
-        <main className="pt-[50px] min-h-screen">{children}</main>
+        <main className="pt-[50px]">{children}</main>
         <Footer />
       </body>
     </html>

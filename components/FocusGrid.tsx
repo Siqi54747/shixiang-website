@@ -4,7 +4,7 @@ export function FocusGrid() {
   return (
     <section
       aria-label="Focus areas"
-      className="border-y border-crimson flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-crimson"
+      className="mx-6 md:mx-24 border border-crimson flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-crimson"
     >
       {copy.focusGrid.items.map((label) => (
         <div

@@ -12,8 +12,8 @@ export default function ReportsListPage() {
   const others = getOtherDecks();
 
   return (
-    <section className="px-6 md:px-12 lg:px-20 py-10 md:py-14">
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,516px)_minmax(0,1fr)] gap-10 lg:gap-14">
+    <section className="px-6 md:px-12 lg:px-20 py-8 md:py-10">
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,480px)_minmax(0,1fr)] gap-8 lg:gap-12">
         {/* Featured (left) */}
         {featured && (
           <div className="lg:sticky lg:top-[74px] self-start">
@@ -39,22 +39,45 @@ export default function ReportsListPage() {
 
         {/* List (right) */}
         <ul className="divide-y divide-rule">
-          {others.map((deck) => (
-            <li key={deck.slug}>
-              <Link
-                href={`/reports/${deck.slug}`}
-                className="block py-7 group hover:bg-black/[0.02] transition-colors -mx-3 px-3 rounded-sm"
-              >
-                <p className="text-[11px] tracking-label uppercase text-meta">
-                  {deck.quarter}
-                </p>
-                <h3 className="font-serif text-[22px] md:text-[26px] text-ink mt-2 group-hover:text-crimson transition-colors">
-                  {deck.title}
-                </h3>
-                <p className="text-[14px] text-muted mt-2">{deck.subtitle}</p>
-              </Link>
-            </li>
-          ))}
+          {others.map((deck) => {
+            const isAvailable = Boolean(deck.docsendUrl);
+            if (isAvailable) {
+              return (
+                <li key={deck.slug}>
+                  <Link
+                    href={`/reports/${deck.slug}`}
+                    className="block py-7 group hover:bg-black/[0.02] transition-colors -mx-3 px-3 rounded-sm"
+                  >
+                    <p className="text-[11px] tracking-label uppercase text-meta">
+                      {deck.quarter}
+                    </p>
+                    <h3 className="font-serif text-[22px] md:text-[26px] text-ink mt-2 group-hover:text-crimson transition-colors">
+                      {deck.title}
+                    </h3>
+                    <p className="text-[14px] text-muted mt-2">{deck.subtitle}</p>
+                  </Link>
+                </li>
+              );
+            }
+            return (
+              <li key={deck.slug}>
+                <div
+                  aria-disabled="true"
+                  className="block py-7 -mx-3 px-3 opacity-60 cursor-default select-none"
+                >
+                  <p className="text-[11px] tracking-label uppercase text-meta">
+                    <span>{deck.quarter}</span>
+                    <span className="mx-2 text-rule">·</span>
+                    <span className="text-crimson">Coming Soon</span>
+                  </p>
+                  <h3 className="font-serif text-[22px] md:text-[26px] text-ink mt-2">
+                    {deck.title}
+                  </h3>
+                  <p className="text-[14px] text-muted mt-2">{deck.subtitle}</p>
+                </div>
+              </li>
+            );
+          })}
         </ul>
       </div>
     </section>

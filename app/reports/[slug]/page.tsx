@@ -53,11 +53,14 @@ export default function ReportDetailPage({ params }: Params) {
 
       <p className="mt-3 text-[14px] text-muted">{meta}</p>
 
-      <div className="mt-6">
-        <DeckEmbed url={deck.embedUrl} title={deck.title} />
+      <div className="mt-6 flex flex-col lg:flex-row lg:items-start gap-8 lg:gap-10">
+        <div className="lg:flex-1 min-w-0">
+          <DeckEmbed url={deck.embedUrl} title={deck.title} />
+        </div>
+        <aside className="lg:w-[140px] lg:pt-2 shrink-0">
+          <ShareBar title={deck.title} />
+        </aside>
       </div>
-
-      <ShareBar title={deck.title} />
     </article>
   );
 }

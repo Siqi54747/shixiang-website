@@ -2,9 +2,9 @@ import { copy } from "@/content/copy";
 
 export function Footer() {
   return (
-    <footer className="border-t border-rule px-6 md:px-24 py-9">
-      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8 md:gap-4">
-        <div className="flex flex-col gap-3">
+    <footer className="border-t border-rule px-6 md:px-24 pt-3 pb-6">
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 md:gap-4">
+        <div className="flex flex-col gap-[6px]">
           <p className="text-[11px] tracking-label uppercase text-meta">
             {copy.footer.contactLabel}
           </p>
@@ -16,7 +16,7 @@ export function Footer() {
           </a>
         </div>
 
-        <div className="flex flex-col gap-3 md:items-end">
+        <div className="flex flex-col gap-[6px] md:items-end">
           <p className="text-[11px] tracking-label uppercase text-meta">
             {copy.footer.officesLabel}
           </p>
@@ -25,7 +25,7 @@ export function Footer() {
           </p>
         </div>
 
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-[6px]">
           <p className="text-[11px] tracking-label uppercase text-meta">
             {copy.footer.wechatLabel}
           </p>
@@ -35,7 +35,7 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-rule mt-9 pt-5">
+      <div className="mt-5">
         <p className="text-[11px] tracking-[0.88px] text-meta whitespace-pre">
           {copy.footer.copyright}
         </p>

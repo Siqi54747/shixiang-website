@@ -24,7 +24,7 @@ export function DeckEmbed({ url, title }: DeckEmbedProps) {
       <div
         className="mx-auto border border-rule bg-cream flex items-center justify-center text-meta text-sm"
         style={{
-          width: "min(100%, calc(55vh * 4 / 3))",
+          width: "min(100%, calc(70vh * 4 / 3))",
           aspectRatio: "4 / 3",
         }}
       >

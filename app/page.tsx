@@ -16,11 +16,11 @@ export default function Home() {
           {copy.hero.eyebrow}
         </p>
 
-        <div className="mt-8 md:mt-10 flex flex-col gap-3 md:gap-4">
-          <h1 className="font-serif text-[56px] md:text-[72px] lg:text-[88px] leading-none tracking-[-0.02em] text-ink">
+        <div className="mt-11 flex flex-col gap-[15px]">
+          <h1 className="font-serif text-[56px] md:text-[72px] lg:text-[96px] leading-none tracking-[-0.02em] text-ink">
             {copy.hero.headline}
           </h1>
-          <p className="font-serif text-[32px] md:text-[42px] lg:text-[48px] leading-[1.2] text-muted">
+          <p className="font-serif text-[32px] md:text-[42px] lg:text-[52px] leading-[1.2] text-muted">
             {copy.hero.subline}
           </p>
         </div>

@@ -40,7 +40,7 @@ export default function ReportsListPage() {
         {/* List (right) */}
         <ul className="divide-y divide-rule">
           {others.map((deck) => {
-            const isAvailable = Boolean(deck.docsendUrl);
+            const isAvailable = Boolean(deck.embedUrl);
             if (isAvailable) {
               return (
                 <li key={deck.slug}>

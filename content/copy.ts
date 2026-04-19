@@ -33,7 +33,7 @@ export const copy = {
     shareCopyLink: "Copy link",
     shareCopied: "已复制",
     shareWechatToast: "已复制链接，粘贴到微信即可分享",
-    docsendPlaceholder: "DocSend embed iframe (placeholder)",
+    embedPlaceholder: "Deck preview (coming soon)",
   },
   wechatModal: {
     label: "WECHAT",

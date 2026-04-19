@@ -1,16 +1,24 @@
 import { copy } from "@/content/copy";
 
-interface DocSendEmbedProps {
+interface DeckEmbedProps {
   url: string;
   title: string;
 }
 
 /**
- * DocSend iframe wrapper.
- * 如果 url 为空，渲染占位符（开发阶段 / 数据未填时）。
- * DocSend embed URL 通常长这样: https://docsend.com/v/[id]
+ * Generic deck preview iframe wrapper.
+ *
+ * Accepts any URL that returns a page designed to be iframed (no
+ * X-Frame-Options: SAMEORIGIN). Currently used with Google Drive
+ * preview URLs: `https://drive.google.com/file/d/<FILE_ID>/preview`.
+ *
+ * An empty `url` renders a placeholder block (for decks whose embed
+ * URL is not yet filled in). See `content/decks.ts`.
+ *
+ * Height is capped at 55vh while preserving a 4:3 aspect ratio so the
+ * iframe + surrounding chrome fits inside one 1280x800 desktop screen.
  */
-export function DocSendEmbed({ url, title }: DocSendEmbedProps) {
+export function DeckEmbed({ url, title }: DeckEmbedProps) {
   if (!url) {
     return (
       <div
@@ -20,7 +28,7 @@ export function DocSendEmbed({ url, title }: DocSendEmbedProps) {
           aspectRatio: "4 / 3",
         }}
       >
-        {copy.reportDetail.docsendPlaceholder}
+        {copy.reportDetail.embedPlaceholder}
       </div>
     );
   }

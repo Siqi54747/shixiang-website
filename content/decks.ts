@@ -6,7 +6,7 @@ export interface Deck {
   publishedDate: string; // ISO "YYYY-MM-DD"
   pages: number;
   readingTime?: string; // e.g. "30 min"
-  docsendUrl: string;   // DocSend share URL; 空字符串 = 未填
+  embedUrl: string;     // iframe-able preview URL (e.g. Google Drive /preview); 空字符串 = 未填
   summary: string;
   featured: boolean;
   status: "draft" | "published";
@@ -26,7 +26,7 @@ export const decks: Deck[] = [
     publishedDate: "2026-04-01",
     pages: 48,
     readingTime: "30 min",
-    docsendUrl: "https://docsend.com/v/mt5tw/shixiang-agi-apr26",
+    embedUrl: "https://drive.google.com/file/d/1M98axRY6TyJQhYE0Z3O102N938yMgtUP/preview",
     summary: "全球 AGI 赛道全景梳理",
     featured: true,
     status: "published",
@@ -39,7 +39,7 @@ export const decks: Deck[] = [
     publishedDate: "2025-10-01",
     pages: 42,
     readingTime: "25 min",
-    docsendUrl: "",
+    embedUrl: "",
     summary: "AI Agent 平台变革",
     featured: false,
     status: "published",
@@ -52,7 +52,7 @@ export const decks: Deck[] = [
     publishedDate: "2025-07-01",
     pages: 36,
     readingTime: "22 min",
-    docsendUrl: "",
+    embedUrl: "",
     summary: "硬件与软件的双重革命",
     featured: false,
     status: "published",
@@ -65,7 +65,7 @@ export const decks: Deck[] = [
     publishedDate: "2025-04-01",
     pages: 28,
     readingTime: "18 min",
-    docsendUrl: "",
+    embedUrl: "",
     summary: "新一代创业者的工具栈",
     featured: false,
     status: "published",

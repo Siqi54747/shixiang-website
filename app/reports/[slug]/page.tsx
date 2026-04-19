@@ -6,7 +6,7 @@ import {
   getPublishedDecks,
   formatMonthYear,
 } from "@/content/decks";
-import { DocSendEmbed } from "@/components/DocSendEmbed";
+import { DeckEmbed } from "@/components/DeckEmbed";
 import { ShareBar } from "@/components/ShareBar";
 
 interface Params {
@@ -54,7 +54,7 @@ export default function ReportDetailPage({ params }: Params) {
       <p className="mt-3 text-[14px] text-muted">{meta}</p>
 
       <div className="mt-6">
-        <DocSendEmbed url={deck.docsendUrl} title={deck.title} />
+        <DeckEmbed url={deck.embedUrl} title={deck.title} />
       </div>
 
       <ShareBar title={deck.title} />

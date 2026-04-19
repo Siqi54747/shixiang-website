@@ -54,16 +54,20 @@ export default function ReportDetailPage({ params }: Params) {
       <p className="mt-3 text-[14px] text-muted">{meta}</p>
 
       <div className="mt-6 flex flex-col lg:flex-row lg:items-start gap-8 lg:gap-12">
-        <div className="shrink-0">
+        {/* Left column: iframe + share bar centered beneath it */}
+        <div className="shrink-0 flex flex-col items-center gap-6">
           <DeckEmbed url={deck.embedUrl} title={deck.title} />
+          <ShareBar title={deck.title} />
         </div>
-        <aside className="lg:flex-1 min-w-0 flex flex-col gap-8">
-          <section className="flex flex-col gap-4">
+
+        {/* Right column: reading guide inside an accent container */}
+        <aside className="lg:flex-1 min-w-0">
+          <section className="border-l-2 border-crimson bg-[#F3F1EA] px-6 py-5 flex flex-col gap-3">
             <p className="text-[11px] tracking-label uppercase text-meta">
               {copy.reportDetail.introTitle}
             </p>
             {deck.intro && deck.intro.length > 0 ? (
-              <div className="flex flex-col gap-3 text-[15px] leading-[1.7] text-ink">
+              <div className="flex flex-col gap-[10px] text-[14px] leading-[1.55] text-ink">
                 {deck.intro.map((para, i) => (
                   <p key={i}>{para}</p>
                 ))}
@@ -74,8 +78,6 @@ export default function ReportDetailPage({ params }: Params) {
               </p>
             )}
           </section>
-
-          <ShareBar title={deck.title} />
         </aside>
       </div>
     </article>

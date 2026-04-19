@@ -14,11 +14,12 @@ interface DeckEmbedProps {
  *
  * An empty `url` renders a placeholder block.
  *
- * Sizing: height capped at 70vh, width reverse-computed to preserve
+ * Sizing: height capped at 75vh, width reverse-computed to preserve
  * the 4:3 ratio the underlying deck is authored in. `max-width: 100%`
  * keeps it safe on narrow parents. No `mx-auto` — callers decide
- * alignment; on report detail the iframe sits left-aligned next to
- * the title column and the reading-guide column fills the right side.
+ * alignment; on report detail the iframe sits in the left column
+ * above a horizontally-centered Share bar, and the reading-guide
+ * column fills the right side.
  */
 export function DeckEmbed({ url, title }: DeckEmbedProps) {
   if (!url) {
@@ -26,7 +27,7 @@ export function DeckEmbed({ url, title }: DeckEmbedProps) {
       <div
         className="border border-rule bg-cream flex items-center justify-center text-meta text-sm"
         style={{
-          width: "min(100%, calc(70vh * 4 / 3))",
+          width: "min(100%, calc(75vh * 4 / 3))",
           aspectRatio: "4 / 3",
         }}
       >

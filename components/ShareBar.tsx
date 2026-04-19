@@ -47,28 +47,30 @@ export function ShareBar({ title }: ShareBarProps) {
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col items-center gap-3">
       <p className="text-[11px] tracking-label uppercase text-meta">
         {copy.reportDetail.shareTitle}
       </p>
-      <div className="flex flex-col gap-[10px] text-[14px] text-ink items-start">
+      <div className="flex items-center gap-3 text-[14px] text-ink">
         <button
           type="button"
-          className="hover:text-crimson transition-colors text-left"
+          className="hover:text-crimson transition-colors"
           onClick={handleWechat}
         >
           {copy.reportDetail.shareWechat}
         </button>
+        <span className="text-rule">|</span>
         <button
           type="button"
-          className="hover:text-crimson transition-colors text-left"
+          className="hover:text-crimson transition-colors"
           onClick={handleTwitter}
         >
           {copy.reportDetail.shareTwitter}
         </button>
+        <span className="text-rule">|</span>
         <button
           type="button"
-          className="hover:text-crimson transition-colors text-left"
+          className="hover:text-crimson transition-colors"
           onClick={handleCopyLink}
         >
           {linkCopied ? copy.reportDetail.shareCopied : copy.reportDetail.shareCopyLink}
@@ -76,7 +78,7 @@ export function ShareBar({ title }: ShareBarProps) {
       </div>
       <p
         aria-live="polite"
-        className={`text-[12px] text-muted leading-[1.4] transition-opacity duration-200 ${
+        className={`text-[12px] text-muted leading-[1.4] min-h-[18px] transition-opacity duration-200 ${
           wechatToast ? "opacity-100" : "opacity-0"
         }`}
       >

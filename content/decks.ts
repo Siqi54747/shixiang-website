@@ -26,7 +26,7 @@ export const decks: Deck[] = [
     publishedDate: "2026-04-01",
     pages: 48,
     readingTime: "30 min",
-    docsendUrl: "", // 待填
+    docsendUrl: "https://docsend.com/v/mt5tw/shixiang-agi-apr26",
     summary: "全球 AGI 赛道全景梳理",
     featured: true,
     status: "published",

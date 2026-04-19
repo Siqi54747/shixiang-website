@@ -12,21 +12,21 @@ interface DeckEmbedProps {
  * X-Frame-Options: SAMEORIGIN). Currently used with Google Drive
  * preview URLs: `https://drive.google.com/file/d/<FILE_ID>/preview`.
  *
- * An empty `url` renders a placeholder block (for decks whose embed
- * URL is not yet filled in). See `content/decks.ts`.
+ * An empty `url` renders a placeholder block.
  *
- * Height is capped at 55vh while preserving a 4:3 aspect ratio so the
- * iframe + surrounding chrome fits inside one 1280x800 desktop screen.
+ * Sizing: fills parent container width; height fixed at 70vh. We no
+ * longer enforce a 4:3 aspect ratio — the underlying Google Drive
+ * preview player responsively letterboxes the PDF to fit whatever
+ * iframe dimensions we give it, so a wider iframe (up to the available
+ * column width on desktop) just produces a cleaner fit with less
+ * horizontal whitespace next to the share rail.
  */
 export function DeckEmbed({ url, title }: DeckEmbedProps) {
   if (!url) {
     return (
       <div
-        className="mx-auto border border-rule bg-cream flex items-center justify-center text-meta text-sm"
-        style={{
-          width: "min(100%, calc(70vh * 4 / 3))",
-          aspectRatio: "4 / 3",
-        }}
+        className="w-full border border-rule bg-cream flex items-center justify-center text-meta text-sm"
+        style={{ height: "70vh" }}
       >
         {copy.reportDetail.embedPlaceholder}
       </div>
@@ -35,11 +35,8 @@ export function DeckEmbed({ url, title }: DeckEmbedProps) {
 
   return (
     <div
-      className="mx-auto border border-rule bg-white overflow-hidden"
-      style={{
-        width: "min(100%, calc(55vh * 4 / 3))",
-        aspectRatio: "4 / 3",
-      }}
+      className="w-full border border-rule bg-white overflow-hidden"
+      style={{ height: "70vh" }}
     >
       <iframe
         src={url}

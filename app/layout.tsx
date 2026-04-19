@@ -28,9 +28,9 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Epunda+Sans:wght@400;500&family=Inter:wght@400;500&family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@400;500&display=swap"
         />
       </head>
-      <body className="font-sans antialiased text-ink bg-cream">
+      <body className="font-sans antialiased text-ink bg-cream min-h-screen flex flex-col">
         <Header />
-        <main className="pt-[50px]">{children}</main>
+        <main className="pt-[50px] flex-1">{children}</main>
         <Footer />
       </body>
     </html>

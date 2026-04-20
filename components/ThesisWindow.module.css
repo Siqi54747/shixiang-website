@@ -262,7 +262,7 @@
 @media (max-width: 1023px) {
   .window { margin: 0; }
   .content { padding: 28px 20px; }
-  .tag        { font-size: 17px; }
+  .tag        { font-size: 15px; }
   .desc       { font-size: 15px; }
   .sub        { font-size: 13px; }
   .lineNumber { font-size: 14px; }
@@ -293,7 +293,7 @@
     box-shadow: var(--hover-shadow);
   }
 
-  .tag        { font-size: 15px; }
+  .tag        { font-size: 13px; }
   .desc       { font-size: 14px; }
   .sub        { font-size: 12px; }
   .lineNumber { font-size: 13px; }

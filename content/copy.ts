@@ -15,6 +15,10 @@ export const copy = {
     eyebrow: "Research the curve. Bet the decade.",
     headline: "Research first.",
     subline: "推动科技大航海。",
+    intro: [
+      "拾象团队坚信智能是这个时代最底层的变量。",
+      "我们以研究穿越周期，与最前沿的创业者、科技企业家一起 bet on 定义下一个 10 年的新物种。",
+    ],
     cta: "Get Our Latest Research  →",
     updatedLabel: "Updated",
   },

@@ -25,7 +25,13 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="mt-10 md:mt-12 flex flex-col md:flex-row md:items-center gap-3 md:gap-8">
+        <div className="mt-8 md:mt-10 flex flex-col gap-[6px] text-[16px] md:text-[17px] leading-[1.75] text-ink max-w-[760px]">
+          {copy.hero.intro.map((p, i) => (
+            <p key={i}>{p}</p>
+          ))}
+        </div>
+
+        <div className="mt-8 md:mt-10 flex flex-col md:flex-row md:items-center gap-3 md:gap-8">
           {featured ? (
             <Link
               href={`/reports/${featured.slug}`}
@@ -42,7 +48,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="px-6 md:px-6 pb-14 md:pb-20">
+      <section className="px-6 md:px-24 pb-14 md:pb-20">
         <ThesisWindow />
       </section>
     </>

@@ -36,7 +36,11 @@
                Menlo, Monaco, Consolas, monospace;
 
   max-width: 1060px;
-  margin: 0 auto;
+  /* Left-aligned (not centered): the window's left edge aligns with
+     the hero column's left edge. Right side can breathe on wide
+     viewports where the parent section's padding exceeds the window's
+     natural right. */
+  margin: 0;
   font-family: var(--font-mono);
   border: 1px solid var(--window-border);
   border-radius: var(--window-border-radius);
@@ -252,7 +256,7 @@
 
 /* ---------- Responsive ---------- */
 @media (max-width: 1023px) {
-  .window { margin: 0 40px; }
+  .window { margin: 0; }
   .content { padding: 28px 20px; }
   .tag        { font-size: 17px; }
   .desc       { font-size: 15px; }
@@ -262,7 +266,7 @@
 
 @media (max-width: 767px) {
   .window {
-    margin: 0 16px;
+    margin: 0;
     border-radius: 4px;
   }
   .topbar {

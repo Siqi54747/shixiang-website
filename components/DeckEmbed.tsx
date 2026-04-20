@@ -25,7 +25,7 @@ export function DeckEmbed({ url, title }: DeckEmbedProps) {
     return (
       <div
         className="w-full border border-rule bg-cream flex items-center justify-center text-meta text-sm"
-        style={{ aspectRatio: "648 / 274" }}
+        style={{ aspectRatio: "4 / 3" }}
       >
         {copy.reportDetail.embedPlaceholder}
       </div>

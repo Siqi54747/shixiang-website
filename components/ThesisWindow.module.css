@@ -130,6 +130,10 @@
   display: block;
   text-decoration: none;
   color: inherit;
+  /* Rendered as <div> (disabled until per-thesis detail pages exist),
+     but must still look clickable on hover, so keep the pointer cursor
+     that <a> would have given us by default. */
+  cursor: pointer;
   padding: 12px 16px;
   margin: -12px -16px;
   border-radius: 4px;

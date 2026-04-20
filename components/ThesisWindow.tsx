@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { copy } from "@/content/copy";
 import styles from "./ThesisWindow.module.css";
 
@@ -58,7 +57,7 @@ export function ThesisWindow() {
               <span className={styles.lineNumber} aria-hidden="true">
                 {String(idx + 1).padStart(2, "0")}
               </span>
-              <Link href={`/thesis/${entry.slug}`} className={styles.link}>
+              <div className={styles.link}>
                 <div className={styles.primary}>
                   <span className={styles.tag}>{entry.tag}</span>
                   <span className={styles.desc}>{entry.desc}</span>
@@ -67,7 +66,7 @@ export function ThesisWindow() {
                   </span>
                 </div>
                 <div className={styles.sub}>{entry.sub}</div>
-              </Link>
+              </div>
             </li>
           ))}
         </ul>

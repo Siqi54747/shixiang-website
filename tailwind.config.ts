@@ -36,8 +36,8 @@ const config: Config = {
       colors: {
         // Brand
         crimson: "#A11F2A",
-        // Surfaces
-        cream: "#FAFAF7",
+        // Surfaces — cream updated 2026-04-20 per Landing V7 spec (#FAFAF7 → #FAF6EC, warmer)
+        cream: "#FAF6EC",
         rule: "#D8D6CF",
         // Text
         ink: "#17171C",

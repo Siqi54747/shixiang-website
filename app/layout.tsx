@@ -25,7 +25,7 @@ export default function RootLayout({
         />
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Epunda+Sans:wght@400;500&family=Inter:wght@400;500&family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@400;500&display=swap"
+          href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Epunda+Sans:wght@400;500&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@400;500&display=swap"
         />
       </head>
       <body className="font-sans antialiased text-ink bg-cream min-h-screen flex flex-col">

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { copy } from "@/content/copy";
-import { FocusGrid } from "@/components/FocusGrid";
+import { ThesisWindow } from "@/components/ThesisWindow";
 import { getFeaturedDeck, formatMonthYear } from "@/content/decks";
 
 export default function Home() {
@@ -29,7 +29,7 @@ export default function Home() {
           {featured ? (
             <Link
               href={`/reports/${featured.slug}`}
-              className="inline-block border-b border-transparent hover:border-crimson pb-[6px] text-[14px] text-ink hover:text-crimson transition-colors w-fit whitespace-pre"
+              className="inline-flex items-center pb-1 text-[14px] text-ink w-fit whitespace-pre border-b border-transparent hover:border-ink hover:font-medium transition-colors duration-200"
             >
               {copy.hero.cta}
             </Link>
@@ -42,7 +42,9 @@ export default function Home() {
         </div>
       </section>
 
-      <FocusGrid />
+      <section className="px-6 md:px-6 pb-14 md:pb-20">
+        <ThesisWindow />
+      </section>
     </>
   );
 }

@@ -1,4 +1,5 @@
 import { copy } from "@/content/copy";
+import { WechatPopover } from "./WechatPopover";
 
 export function Footer() {
   return (
@@ -29,9 +30,7 @@ export function Footer() {
           <p className="text-[11px] tracking-label uppercase text-meta">
             {copy.footer.wechatLabel}
           </p>
-          <p className="font-serif text-[18px] text-ink">
-            {copy.footer.wechatHandle}
-          </p>
+          <WechatPopover />
         </div>
       </div>
 

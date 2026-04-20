@@ -19,7 +19,41 @@ export const copy = {
     updatedLabel: "Updated",
   },
   focusGrid: {
+    // Deprecated 2026-04-20: replaced by the Thesis terminal-window component. Kept so nothing breaks if an old reference lingers.
     items: ["AGI Labs", "Robotics", "AI for Science", "Agent-Native"] as const,
+  },
+  thesis: {
+    filename: "shixiang-agi-thesis.md",
+    command: "$ cat thesis.md",
+    updatedLabel: "UPDATED",
+    branch: "main",
+    ready: "ready",
+    entries: [
+      {
+        slug: "agi-labs",
+        tag: "AGI Labs",
+        desc: "模型能力仍是价值创造的核心变量",
+        sub: "全球 Tier-1 AI Labs · Neo Labs · LLM-native Infra",
+      },
+      {
+        slug: "robotics",
+        tag: "Robotics",
+        desc: "VLA 将解锁通用机器人的 ChatGPT 时刻",
+        sub: "机器人硬件 · 仿真与数据 · Foundation Model for Robotics",
+      },
+      {
+        slug: "ai-for-science",
+        tag: "AI for Science",
+        desc: "AI 正在重构科学发现的范式，下一个 10 亿美元分子一定来自 AI",
+        sub: "AI 制药 · AI 材料 · Research Agents",
+      },
+      {
+        slug: "agent-native",
+        tag: "Agent-Native",
+        desc: "Agent 是组成新的互联网，会带来软件的下一次重写",
+        sub: "Coding Agent · Infra for Agent · Vertical Agent",
+      },
+    ],
   },
   reportsList: {
     featuredEyebrow: "LATEST REPORT",

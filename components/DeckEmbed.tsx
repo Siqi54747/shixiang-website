@@ -14,33 +14,26 @@ interface DeckEmbedProps {
  *
  * An empty `url` renders a placeholder block.
  *
- * Sizing: fills parent column width; aspect ratio 648:274 locked to
- * match Figma 156:2 (Report Detail — Plan B v1, 2026-04-20). The
- * parent column is lg:w-[648px], so at 1280×800 the iframe resolves
- * to exactly 648×274 — the dimension user tuned in Figma. Google
- * Drive's preview player letterboxes the underlying PDF to fit.
+ * Sizing: fills parent column width; aspect ratio locked to 16:9 via
+ * Tailwind's `aspect-video`. The iframe uses absolute + inset-0 so
+ * it strictly fills the aspect-ratio wrapper regardless of the
+ * provider's internal sizing.
  */
 export function DeckEmbed({ url, title }: DeckEmbedProps) {
   if (!url) {
     return (
-      <div
-        className="w-full border border-rule bg-cream flex items-center justify-center text-meta text-sm"
-        style={{ aspectRatio: "16 / 9" }}
-      >
+      <div className="aspect-video w-full border border-rule bg-cream flex items-center justify-center text-meta text-sm">
         {copy.reportDetail.embedPlaceholder}
       </div>
     );
   }
 
   return (
-    <div
-      className="w-full border border-rule bg-white overflow-hidden"
-      style={{ aspectRatio: "648 / 274" }}
-    >
+    <div className="aspect-video w-full relative border border-rule bg-white overflow-hidden">
       <iframe
         src={url}
         title={title}
-        className="w-full h-full"
+        className="absolute inset-0 w-full h-full"
         frameBorder={0}
         allowFullScreen
         allow="fullscreen"

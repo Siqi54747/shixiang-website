@@ -53,17 +53,17 @@ export default function ReportDetailPage({ params }: Params) {
 
       <p className="mt-3 text-[14px] text-muted">{meta}</p>
 
-      <div className="mt-6 flex flex-col lg:flex-row lg:items-start gap-8 lg:gap-12">
+      <div className="mt-6 flex flex-col gap-8 lg:grid lg:grid-cols-3 lg:gap-12 lg:items-start">
         {/* Left column: iframe + share bar centered beneath it.
-            Width 648px on lg+ per Figma 156:2 (2026-04-20). */}
-        <div className="shrink-0 flex flex-col items-center gap-[14px] lg:w-[648px]">
+            2/3 of the split via col-span-2. */}
+        <div className="lg:col-span-2 flex flex-col items-center gap-[14px]">
           <DeckEmbed url={deck.embedUrl} title={deck.title} />
           <ShareBar title={deck.title} />
         </div>
 
         {/* Right column: reading guide inside an accent container.
-            Takes the remaining width — ≈ 389px on a 1280 viewport. */}
-        <aside className="lg:flex-1 min-w-0">
+            1/3 of the split via col-span-1. */}
+        <aside className="lg:col-span-1 min-w-0">
           <section className="border-l-2 border-crimson bg-[#F3F1EA] px-6 py-5 flex flex-col gap-3">
             <p className="text-[11px] tracking-label uppercase text-meta">
               {copy.reportDetail.introTitle}

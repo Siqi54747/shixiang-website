@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import matter from "gray-matter";
 import { marked } from "marked";
 import { copy } from "@/content/copy";
+import { preprocessThesisMarkdown } from "@/lib/markdown";
 
 interface Params {
   params: { slug: string };
@@ -70,12 +71,9 @@ export default function ThesisDetailPage({ params }: Params) {
     cover?: string;
   };
 
-  // Clean up a WeChat-export quirk: adjacent bold runs get welded with
-  // no separator ("**A****B**"), and CommonMark's bold parser chokes on
-  // runs of 4+ asterisks — the leftover `**` then renders raw. Split
-  // any ≥4 asterisk run into two `**` markers with a space between, so
-  // each bold segment is independently balanced.
-  const cleanedMd = thesis.content.replace(/\*{4,}/g, "** **");
+  // Normalize WeChat-export quirks (welded bold, leading cover link,
+  // split section-number heads, tail boilerplate). See lib/markdown.ts.
+  const cleanedMd = preprocessThesisMarkdown(thesis.content);
 
   const html = marked.parse(cleanedMd, {
     async: false,

@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import matter from "gray-matter";
 import { marked } from "marked";
 import { copy } from "@/content/copy";
-import { preprocessThesisMarkdown } from "@/lib/markdown";
+import { preprocessThesisMarkdown, postprocessThesisHtml } from "@/lib/markdown";
 
 interface Params {
   params: { slug: string };
@@ -75,11 +75,12 @@ export default function ThesisDetailPage({ params }: Params) {
   // split section-number heads, tail boilerplate). See lib/markdown.ts.
   const cleanedMd = preprocessThesisMarkdown(thesis.content);
 
-  const html = marked.parse(cleanedMd, {
+  const rawHtml = marked.parse(cleanedMd, {
     async: false,
     gfm: true,
     breaks: false,
   }) as string;
+  const html = postprocessThesisHtml(rawHtml);
 
   return (
     <article className="px-6 md:px-24 py-10 md:py-16">

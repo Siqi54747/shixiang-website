@@ -55,3 +55,61 @@ export function preprocessThesisMarkdown(body: string): string {
 
   return md;
 }
+
+/**
+ * HTML-level post-processing after marked.parse.
+ *
+ * A systematic sweep of all four theses (2026-04-21) showed marked
+ * leaves behind a meaningful amount of literal emphasis markers that
+ * the pre-parse rules in preprocessThesisMarkdown() cannot reach —
+ * because they live *inside* paragraphs, not as structural patterns:
+ *
+ *   agi-labs        21 bare **, 3 bare __
+ *   robotics        42 bare **, 1 bare __
+ *   ai-for-science 120 bare **, 0 bare __
+ *   agent-native    18 bare **, 10 bare __
+ *                  ---  ---
+ *   total          201 bare **, 14 bare __
+ *
+ * Root cause patterns we observed:
+ *   - opened bold mid-paragraph but closing `**` sits across a
+ *     paragraph break — marked's emphasis rule forbids that, so it
+ *     keeps the opener as literal text
+ *   - CJK punctuation welded to `**` so opener/closer boundary
+ *     detection fails in CommonMark's left-flanking / right-flanking
+ *     rules
+ *
+ * Fixing either rigorously means either swapping to a more permissive
+ * parser (markdown-it) or doing structural rewrites that risk damaging
+ * correctly-authored markdown elsewhere. Both are disproportionate to
+ * the payoff. Pragmatic fix: strip the residual `**` / `__` markers
+ * from the produced HTML — we lose a handful of intended bolds (that
+ * were already broken at the markdown layer) in exchange for clean
+ * reading text. The post-processor runs after marked has already
+ * converted all properly-balanced bolds to `<strong>`, so legitimate
+ * emphasis is fully preserved.
+ */
+export function postprocessThesisHtml(html: string): string {
+  let out = html;
+
+  // Rule P1 — strip residual emphasis markers that marked couldn't
+  // resolve (see function header). ** first, __ second.
+  out = out.replace(/\*\*/g, "");
+  out = out.replace(/__/g, "");
+
+  // Rule P2 — promote short bold-only paragraphs to <h3>.
+  // WeChat public-account export never emits `#`-style headings; all
+  // "section titles" arrive as `<p><strong>…</strong></p>`. That
+  // leaves the reading experience flat — 400 paragraphs all at the
+  // same visual weight. Heuristic: a <p> whose *entire* content is a
+  // single <strong> with ≤40 chars of plain text inside is almost
+  // certainly a heading, not a running-text emphasis. Promote to <h3>.
+  // (40 is chosen empirically: long thesis sentences typically exceed
+  // this; headings like "投资主题 1：Environment" stay under it.)
+  out = out.replace(
+    /<p>\s*<strong>([^<>]{1,40})<\/strong>\s*<\/p>/g,
+    "<h3>$1</h3>"
+  );
+
+  return out;
+}

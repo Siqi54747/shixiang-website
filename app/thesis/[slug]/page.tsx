@@ -70,7 +70,14 @@ export default function ThesisDetailPage({ params }: Params) {
     cover?: string;
   };
 
-  const html = marked.parse(thesis.content, {
+  // Clean up a WeChat-export quirk: adjacent bold runs get welded with
+  // no separator ("**A****B**"), and CommonMark's bold parser chokes on
+  // runs of 4+ asterisks — the leftover `**` then renders raw. Split
+  // any ≥4 asterisk run into two `**` markers with a space between, so
+  // each bold segment is independently balanced.
+  const cleanedMd = thesis.content.replace(/\*{4,}/g, "** **");
+
+  const html = marked.parse(cleanedMd, {
     async: false,
     gfm: true,
     breaks: false,

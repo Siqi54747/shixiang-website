@@ -11,7 +11,7 @@ export default function Home() {
 
   return (
     <>
-      <section className="px-4 md:px-8 lg:px-12 pt-10 md:pt-14 pb-10 md:pb-14">
+      <section className="px-6 md:px-24 pt-10 md:pt-14 pb-10 md:pb-14">
         <p className="font-display text-crimson text-[14px] tracking-eyebrow uppercase">
           {copy.hero.eyebrow}
         </p>
@@ -48,7 +48,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="px-4 md:px-8 lg:px-12 pb-14 md:pb-20">
+      <section className="px-6 md:px-24 pb-14 md:pb-20">
         <ThesisWindow />
       </section>
     </>

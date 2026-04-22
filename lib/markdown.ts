@@ -154,6 +154,25 @@ export function postprocessThesisHtml(html: string): string {
   out = out.replace(/\*\*/g, "");
   out = out.replace(/__/g, "");
 
+  // Rule P3 — silently hide broken images.
+  //
+  // Thesis image URLs point at raw.githubusercontent.com/.../UO-articles.
+  // Most resolve once the images/ subtree is pushed, but (a) during
+  // the push-lag window images 404 en masse, and (b) individual CDN
+  // misses will always be possible going forward. Combined with the
+  // `prose-img:border prose-img:border-rule` style, a broken image
+  // renders as a harsh horizontal line across the page.
+  //
+  // Inject a native `onerror` handler so broken images self-remove
+  // on load failure. This is a raw HTML attribute, not a React
+  // handler, so it survives SSR + dangerouslySetInnerHTML cleanly.
+  // Intentionally skipped if the tag already carries onerror (future
+  // authoring safety).
+  out = out.replace(
+    /<img\b(?![^>]*\bonerror=)([^>]*?)\s*\/?>/g,
+    '<img$1 onerror="this.style.display=\'none\'" />'
+  );
+
   // Rule P2 — promote short bold-only paragraphs to <h3>.
   // WeChat public-account export never emits `#`-style headings; all
   // "section titles" arrive as `<p><strong>…</strong></p>`. That

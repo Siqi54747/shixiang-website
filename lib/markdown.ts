@@ -29,8 +29,16 @@
 export function preprocessThesisMarkdown(body: string): string {
   let md = body;
 
-  // Rule 1 — split welded bold runs
-  md = md.replace(/\*{4,}/g, "** **");
+  // Rule 1 — stitch welded bold runs.
+  //
+  // `**A****B**` in the export is almost always one intended bold
+  // ("AB") where the WeChat source had an inline style boundary that
+  // survived as `****`. Older iterations of this rule split the run
+  // into `** **`, which left two adjacent bolds that downstream rules
+  // (Rule 3, P2) could not recognize as a single heading. Stitching
+  // them back together produces the author's intended single strong
+  // span and lets later structural rules fire correctly.
+  md = md.replace(/\*{4,}/g, "");
 
   // Rule 4 — strip tail boilerplate (do this before other rules so we
   // don't waste cycles rewriting paragraphs we'll throw away)

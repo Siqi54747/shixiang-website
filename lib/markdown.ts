@@ -73,6 +73,25 @@ export function preprocessThesisMarkdown(body: string): string {
     md = stripped + tail;
   }
 
+  // Rule 6 — strip the WeChat-authored table of contents.
+  //
+  // Articles sometimes open with a "💡 目录 💡" block listing the
+  // chapter titles as indented plain-text lines. On our Sequoia page
+  // this renders as a redundant, non-interactive list wedged right
+  // before the first chapter. A programmatic sidebar TOC generated
+  // from <h2> is on the polish backlog; for now the hand-authored
+  // source block is strictly noise.
+  //
+  // Terminates at the first chapter-heading bold run (`**NN.**`).
+  // Must run BEFORE Rule 3 converts those to markdown headings, so
+  // the terminator regex still matches the raw bold form. If no
+  // terminator is found the replace is a no-op (defensive — we'd
+  // rather leave an ugly TOC than swallow the whole article).
+  md = md.replace(
+    /\n*[ \t]*💡\s*目录\s*💡[\s\S]*?(?=\n\s*\*\*\d{1,2}\.\s*\*\*)/,
+    "\n"
+  );
+
   // Rule 3 — promote "**NN.**\n\n**title**" pair to a markdown H2.
   //
   // WeChat export emits top-level chapter headings ("01.", "02.", ...)

@@ -47,12 +47,31 @@ export function preprocessThesisMarkdown(body: string): string {
     md = md.slice(0, tailMatch.index).trimEnd() + "\n";
   }
 
-  // Rule 2 — strip leading cover-image link (first non-whitespace line
-  // of body matches the image-wrapped-in-link pattern)
-  md = md.replace(
-    /^\s*\[!\[[^\]]*\]\([^)]*\)\]\([^)]*\)\s*\n+/,
-    ""
-  );
+  // Rule 2 — strip decorative images in the pre-byline head region.
+  //
+  // WeChat exports consistently open with a run of decorative assets
+  // before the article body begins: a cover link back to the original
+  // post, then 1-3 standalone banner/divider images (separators,
+  // section dividers, animated gifs). Collectively these render as
+  // stray lines/broken-img placeholders at the very top of the page,
+  // visually polluting the otherwise clean Sequoia-minimalist hero.
+  //
+  // Structural anchor: these decorations always sit *before* the
+  // "作者：..." or "编辑：..." byline. Scope the strip to that
+  // head-region so we can't accidentally remove inline body figures.
+  // If no byline is found, skip the rule (defensive; all 4 current
+  // theses have one).
+  const bylineMatch = md.match(/^\s*(?:作者|编辑)[：:]/m);
+  if (bylineMatch && bylineMatch.index !== undefined) {
+    const head = md.slice(0, bylineMatch.index);
+    const tail = md.slice(bylineMatch.index);
+    const stripped = head
+      // Linked cover images: [![alt](img)](wechat-url)
+      .replace(/\[!\[[^\]]*\]\([^)]*\)\]\([^)]*\)\s*\n+/g, "")
+      // Plain standalone images
+      .replace(/!\[[^\]]*\]\([^)]*\)\s*\n+/g, "");
+    md = stripped + tail;
+  }
 
   // Rule 3 — promote "**NN.**\n\n**title**" pair to a markdown H2.
   //

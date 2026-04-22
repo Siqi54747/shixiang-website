@@ -54,11 +54,22 @@ export function preprocessThesisMarkdown(body: string): string {
     ""
   );
 
-  // Rule 3 — merge "**NN.**" standalone paragraph with the "**title**"
-  // paragraph that follows it
+  // Rule 3 — promote "**NN.**\n\n**title**" pair to a markdown H2.
+  //
+  // WeChat export emits top-level chapter headings ("01.", "02.", ...)
+  // as a two-paragraph bold pair: `**NN.**` alone, then `**title**`
+  // on its own line. Previous versions merged these into a single
+  // bold paragraph (`**NN. title**`) and relied on postprocess P2 to
+  // promote short bold-only paragraphs to <h3>. That flattened all
+  // structural levels — top-level chapters and sub-section headings
+  // both landed as <h3>.
+  //
+  // Now we emit `## NN. title` (markdown H2) directly, so marked
+  // produces <h2> for chapter headings; P2 continues to handle the
+  // sub-section short-bold paragraphs as <h3>. Two clean levels.
   md = md.replace(
-    /\*\*\s*(\d{1,2}\.)\s*\*\*\s*\n\s*\n\s*\*\*\s*([^\n]+?)\s*\*\*/g,
-    "**$1 $2**"
+    /\*\*\s*(\d{1,2})\.\s*\*\*\s*\n\s*\n\s*\*\*\s*([^\n]+?)\s*\*\*/g,
+    "## $1. $2"
   );
 
   return md;

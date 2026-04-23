@@ -19,16 +19,24 @@
  *   - token rotation / quota hiccups would block production pushes
  *   - committed snapshots give us an obvious rollback unit
  *
+ * Auth model:
+ *   Piggyback on the local `lark-cli` install's logged-in user
+ *   identity (Siqi). No separate Lark app / tenant token to manage.
+ *   Prerequisite: the user has run `lark-cli auth login --domain base`
+ *   at least once; the CLI refreshes tokens automatically thereafter.
+ *   Since sync is always a local, manual operation (never in CI), a
+ *   user-bound token is the right fit — no "headless bot app must be
+ *   added as Base collaborator" step required.
+ *
  * Required env vars (from .env.local or shell):
- *   LARK_APP_ID           拾象飞书应用 app_id
- *   LARK_APP_SECRET       拾象飞书应用 app_secret
- *   LARK_BASE_APP_TOKEN   Decks Base 的 app_token (URL 里的 bascnXXXX 段)
+ *   LARK_BASE_APP_TOKEN   Decks Base 的 app_token (URL 里的 /base/<token> 段)
  *   LARK_BASE_TABLE_ID    Decks 表的 table_id (tblXXXX)
  *
  * See docs/operations-decks-base.md for the Base schema and the
  * human workflow.
  */
 
+import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
@@ -52,43 +60,40 @@ function loadDotEnvLocal(): void {
 
 loadDotEnvLocal();
 
-const APP_ID = process.env.LARK_APP_ID;
-const APP_SECRET = process.env.LARK_APP_SECRET;
 const BASE_APP_TOKEN = process.env.LARK_BASE_APP_TOKEN;
 const BASE_TABLE_ID = process.env.LARK_BASE_TABLE_ID;
 
-if (!APP_ID || !APP_SECRET || !BASE_APP_TOKEN || !BASE_TABLE_ID) {
+if (!BASE_APP_TOKEN || !BASE_TABLE_ID) {
   console.error(
-    "[sync-decks] Missing env vars. Need LARK_APP_ID / LARK_APP_SECRET / LARK_BASE_APP_TOKEN / LARK_BASE_TABLE_ID."
+    "[sync-decks] Missing env vars: LARK_BASE_APP_TOKEN / LARK_BASE_TABLE_ID."
   );
   console.error(
-    "[sync-decks] Copy .env.local.example to .env.local and fill the values, or export them in your shell."
+    "[sync-decks] Copy .env.local.example to .env.local and fill the 2 Base identifiers."
   );
   process.exit(1);
 }
 
-// ----- Lark API client ---------------------------------------------------
+// ----- Lark CLI client ---------------------------------------------------
+//
+// Every Lark interaction shells out to `lark-cli` with --as user so we
+// ride on whoever did `lark-cli auth login` locally. Errors from the
+// CLI bubble up via the stderr of its child process.
 
-const LARK_BASE_URL = "https://open.feishu.cn/open-apis";
-
-async function getTenantToken(): Promise<string> {
-  const res = await fetch(
-    `${LARK_BASE_URL}/auth/v3/tenant_access_token/internal`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json; charset=utf-8" },
-      body: JSON.stringify({ app_id: APP_ID, app_secret: APP_SECRET }),
-    }
-  );
-  const body = (await res.json()) as {
-    code: number;
-    msg: string;
-    tenant_access_token?: string;
-  };
-  if (body.code !== 0 || !body.tenant_access_token) {
-    throw new Error(`tenant_access_token failed: code=${body.code} msg=${body.msg}`);
+function larkCli(args: string[]): string {
+  try {
+    const out = execFileSync("lark-cli", args, {
+      encoding: "utf-8",
+      maxBuffer: 64 * 1024 * 1024,
+    });
+    return out;
+  } catch (err) {
+    const e = err as { status?: number; stderr?: Buffer | string; stdout?: Buffer | string; message?: string };
+    const stderr = e.stderr ? e.stderr.toString() : "";
+    const stdout = e.stdout ? e.stdout.toString() : "";
+    throw new Error(
+      `lark-cli ${args.join(" ")} failed (code=${e.status ?? "?"}): ${stderr || stdout || e.message || "unknown"}`
+    );
   }
-  return body.tenant_access_token;
 }
 
 interface BaseRecord {
@@ -96,32 +101,68 @@ interface BaseRecord {
   fields: Record<string, unknown>;
 }
 
-async function fetchAllRecords(token: string): Promise<BaseRecord[]> {
+/**
+ * Fetch all records from the configured Base table, normalized to the
+ * { record_id, fields: { <colName>: <val> } } shape the rest of this
+ * script expects.
+ *
+ * lark-cli's +record-list returns a tabular format rather than a list
+ * of record objects:
+ *   {
+ *     data: {
+ *       fields: ["Slug", "Intro", ...],       // column names, in order
+ *       data: [["slug1", "...", ...], ...],   // each sub-array = one row
+ *       record_id_list: ["recXXX", ...],
+ *       has_more, ...
+ *     }
+ *   }
+ * We zip `fields` with each row to rebuild a per-record dict.
+ */
+function fetchAllRecords(): BaseRecord[] {
   const all: BaseRecord[] = [];
-  let pageToken: string | undefined;
-  // safety cap — we don't expect more than a handful of decks
-  for (let i = 0; i < 20; i++) {
-    const params = new URLSearchParams({ page_size: "100" });
-    if (pageToken) params.set("page_token", pageToken);
-    const url = `${LARK_BASE_URL}/bitable/v1/apps/${BASE_APP_TOKEN}/tables/${BASE_TABLE_ID}/records?${params}`;
-    const res = await fetch(url, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const body = (await res.json()) as {
-      code: number;
-      msg: string;
+  let offset = 0;
+  const limit = 100;
+  for (let page = 0; page < 20; page++) {
+    const raw = larkCli([
+      "base",
+      "+record-list",
+      "--base-token",
+      BASE_APP_TOKEN as string,
+      "--table-id",
+      BASE_TABLE_ID as string,
+      "--limit",
+      String(limit),
+      "--offset",
+      String(offset),
+      "--as",
+      "user",
+    ]);
+    const body = JSON.parse(raw) as {
+      ok: boolean;
       data?: {
-        items?: BaseRecord[];
+        data?: unknown[][];
+        fields?: string[];
+        record_id_list?: string[];
         has_more?: boolean;
-        page_token?: string;
       };
+      error?: unknown;
     };
-    if (body.code !== 0) {
-      throw new Error(`records fetch failed: code=${body.code} msg=${body.msg}`);
+    if (!body.ok || !body.data) {
+      throw new Error(`record-list failed: ${JSON.stringify(body.error ?? body)}`);
     }
-    all.push(...(body.data?.items ?? []));
-    if (!body.data?.has_more) break;
-    pageToken = body.data.page_token;
+    const colNames = body.data.fields ?? [];
+    const rows = body.data.data ?? [];
+    const ids = body.data.record_id_list ?? [];
+    for (let i = 0; i < rows.length; i++) {
+      const fields: Record<string, unknown> = {};
+      const row = rows[i];
+      for (let c = 0; c < colNames.length; c++) {
+        fields[colNames[c]] = row[c];
+      }
+      all.push({ record_id: ids[i] ?? "", fields });
+    }
+    if (!body.data.has_more || rows.length === 0) break;
+    offset += rows.length;
   }
   return all;
 }
@@ -177,8 +218,17 @@ function readCheckbox(v: unknown): boolean {
 }
 
 function readSingleSelect(v: unknown): string {
-  // Lark 单选 returns string or { text }
+  // lark-cli returns single-select as ["optionName"]; readText
+  // joins array elements so this collapses to the option name.
   return readText(v).trim();
+}
+
+function readUrl(v: unknown): string {
+  // The Base URL column, when fetched via lark-cli, serializes as
+  // "[url](url)" Markdown. Strip that shell to get the bare href.
+  const s = readText(v).trim();
+  const m = s.match(/^\[(.+?)\]\((.+?)\)$/);
+  return m ? (m[2] || m[1]) : s;
 }
 
 function readCommaList(v: unknown): string[] {
@@ -224,60 +274,59 @@ function readFirstAttachment(v: unknown): AttachmentRef | undefined {
 /**
  * Download a cover attachment to public/covers/<slug>.<ext>.
  *
- * Uses Lark's drive media download endpoint; tenant access token has
- * read permission because the Lark app is a collaborator on the Base.
+ * Shells out to `lark-cli api GET /open-apis/drive/v1/medias/<token>/download`
+ * with `--as user` (same identity used for record-list). lark-cli
+ * handles user-token refresh and writes the binary response straight
+ * to the `-o` path.
  *
  * File extension strategy:
- *   1. Prefer the extension from the attachment's original `name` (if any).
- *   2. Fall back to sniffing the Content-Type.
- *   3. Default to `.jpg` if nothing matches.
+ *   1. Prefer the extension from the attachment's original `name`.
+ *   2. Fall back to `.jpg` if nothing sensible is there.
  *
  * Returns the public path (`/covers/<slug>.<ext>`) on success, or
  * undefined on failure (warn logged, not thrown — a missing cover
  * should never block the sync of the remaining data).
  */
-async function downloadCover(
-  token: string,
+function downloadCover(
   attachment: AttachmentRef,
   slug: string
-): Promise<string | undefined> {
-  const url = `${LARK_BASE_URL}/drive/v1/medias/${encodeURIComponent(
-    attachment.file_token
-  )}/download`;
-  const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) {
-    console.warn(
-      `[sync-decks] cover download failed for '${slug}': HTTP ${res.status}`
-    );
-    return undefined;
-  }
-  const ctype = (res.headers.get("content-type") ?? "").toLowerCase();
+): string | undefined {
   const nameExt = attachment.name.match(/\.([a-zA-Z0-9]+)$/)?.[1]?.toLowerCase();
   const ext =
     nameExt && /^(jpg|jpeg|png|webp|gif|avif)$/.test(nameExt)
       ? nameExt === "jpeg"
         ? "jpg"
         : nameExt
-      : ctype.includes("png")
-      ? "png"
-      : ctype.includes("webp")
-      ? "webp"
-      : ctype.includes("gif")
-      ? "gif"
-      : ctype.includes("avif")
-      ? "avif"
       : "jpg";
 
   const outDir = resolve("public/covers");
   if (!existsSync(outDir)) mkdirSync(outDir, { recursive: true });
   const outPath = resolve(outDir, `${slug}.${ext}`);
-  const buf = Buffer.from(await res.arrayBuffer());
-  writeFileSync(outPath, buf);
-  console.log(
-    `[sync-decks] cover downloaded: ${outPath} (${buf.length} bytes)`
-  );
+
+  try {
+    larkCli([
+      "api",
+      "GET",
+      `/open-apis/drive/v1/medias/${attachment.file_token}/download`,
+      "--as",
+      "user",
+      "-o",
+      outPath,
+    ]);
+  } catch (err) {
+    console.warn(
+      `[sync-decks] cover download failed for '${slug}': ${(err as Error).message.slice(0, 200)}`
+    );
+    return undefined;
+  }
+
+  if (!existsSync(outPath)) {
+    console.warn(
+      `[sync-decks] cover download for '${slug}' produced no file at ${outPath}`
+    );
+    return undefined;
+  }
+  console.log(`[sync-decks] cover downloaded: ${outPath}`);
   return `/covers/${slug}.${ext}`;
 }
 
@@ -326,7 +375,7 @@ function recordToDeck(record: BaseRecord): Deck {
     subtitle: readText(f[COL.subtitle]).trim(),
     quarter: readText(f[COL.quarter]).trim(),
     publishedDate: readIsoDate(f[COL.publishedDate]),
-    embedUrl: readText(f[COL.embedUrl]).trim(),
+    embedUrl: readUrl(f[COL.embedUrl]),
     summary: readText(f[COL.summary]).trim(),
     featured: readCheckbox(f[COL.featured]),
     status: status === "draft" ? "draft" : "published",
@@ -424,12 +473,9 @@ function overwriteDecksArray(newBody: string): void {
 
 // ----- main --------------------------------------------------------------
 
-async function main() {
-  console.log("[sync-decks] fetching tenant_access_token...");
-  const token = await getTenantToken();
-
-  console.log("[sync-decks] fetching records from Base...");
-  const records = await fetchAllRecords(token);
+function main() {
+  console.log("[sync-decks] fetching records from Base via lark-cli...");
+  const records = fetchAllRecords();
   console.log(`[sync-decks] received ${records.length} records`);
 
   const decks = records.map(recordToDeck);
@@ -437,12 +483,12 @@ async function main() {
 
   // Pair each record back to its deck so we can pull the Cover
   // attachment column (non-primitive, handled outside recordToDeck).
-  // Serial, not parallel — no good reason to hammer the drive API
-  // and we're downloading a handful of files at most.
+  // Serial — lark-cli shells one process per call and the cover count
+  // is always tiny.
   for (let i = 0; i < records.length; i++) {
     const att = readFirstAttachment(records[i].fields[COL.cover]);
     if (!att) continue;
-    const localPath = await downloadCover(token, att, decks[i].slug);
+    const localPath = downloadCover(att, decks[i].slug);
     if (localPath) decks[i].cover = localPath;
   }
 
@@ -457,7 +503,9 @@ async function main() {
   console.log("[sync-decks] next: git diff content/decks.ts");
 }
 
-main().catch((err) => {
+try {
+  main();
+} catch (err) {
   console.error("[sync-decks] FAILED:", err instanceof Error ? err.message : err);
   process.exit(1);
-});
+}

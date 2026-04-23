@@ -79,94 +79,77 @@ export async function GET(req: Request) {
           height: "100%",
           display: "flex",
           flexDirection: "column",
+          justifyContent: "space-between",
           backgroundColor: "#FAF6EC", // cream
-          padding: "72px 96px",
+          padding: "80px 96px",
           fontFamily: "Noto Sans, sans-serif",
           color: "#17171C", // ink
-          position: "relative",
         }}
       >
-        {/* Top-left: brand logo */}
-        <div style={{ display: "flex", alignItems: "center" }}>
+        {/* Top: brand logo, sized to keep the red elephant clearly
+            readable at feed thumbnail scale */}
+        <div style={{ display: "flex" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={logoDataUrl}
             alt="拾象科技"
-            style={{ height: "56px", width: "auto" }}
+            style={{ height: "72px", width: "auto" }}
           />
         </div>
 
-        {/* Centered content block — crimson accent bar + eyebrow + title + subtitle */}
-        <div
-          style={{
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            marginTop: "32px",
-          }}
-        >
-          {/* Crimson accent bar (same visual motif as Reading Guide border) */}
-          <div
-            style={{
-              width: "4px",
-              height: "auto",
-              minHeight: "260px",
-              backgroundColor: "#A11F2A",
-              position: "absolute",
-              left: "96px",
-              top: "220px",
-              bottom: "140px",
-            }}
-          />
+        {/* Center/bottom-weighted content block */}
+        <div style={{ display: "flex", flexDirection: "column" }}>
           <div
             style={{
               display: "flex",
-              flexDirection: "column",
-              paddingLeft: "32px",
+              fontSize: "22px",
+              color: "#A11F2A",
+              letterSpacing: "2px",
+              fontWeight: 500,
+              textTransform: "uppercase",
             }}
           >
-            <div
-              style={{
-                fontSize: "22px",
-                color: "#A11F2A",
-                letterSpacing: "2px",
-                fontWeight: 500,
-                textTransform: "uppercase",
-              }}
-            >
-              {eyebrow}
-            </div>
-            <div
-              style={{
-                fontSize: title.length > 30 ? "64px" : "80px",
-                lineHeight: 1.08,
-                marginTop: "28px",
-                color: "#17171C",
-                fontWeight: 500,
-                // serif fallback — Satori auto-falls back to Noto Sans
-                // if Georgia isn't registered, but it still reads better
-                // than nothing.
-                fontFamily: "Georgia, 'Noto Serif SC', serif",
-              }}
-            >
-              {title}
-            </div>
-            <div
-              style={{
-                fontSize: "30px",
-                color: "#5A5A60", // muted
-                marginTop: "24px",
-                lineHeight: 1.35,
-                fontFamily: "Georgia, 'Noto Serif SC', serif",
-              }}
-            >
-              {subtitle}
-            </div>
+            {eyebrow}
           </div>
+          <div
+            style={{
+              display: "flex",
+              fontSize: title.length > 30 ? "72px" : "88px",
+              lineHeight: 1.08,
+              marginTop: "20px",
+              color: "#17171C",
+              fontWeight: 500,
+              fontFamily: "Georgia, 'Noto Serif SC', serif",
+            }}
+          >
+            {title}
+          </div>
+          <div
+            style={{
+              display: "flex",
+              fontSize: "32px",
+              color: "#5A5A60", // muted
+              marginTop: "18px",
+              lineHeight: 1.35,
+              fontFamily: "Georgia, 'Noto Serif SC', serif",
+            }}
+          >
+            {subtitle}
+          </div>
+          {/* A thin crimson rule under the title block — echoes the
+              site's use of hairline rules; no dangling vertical bar */}
+          <div
+            style={{
+              display: "flex",
+              marginTop: "48px",
+              width: "120px",
+              height: "3px",
+              backgroundColor: "#A11F2A",
+            }}
+          />
         </div>
 
-        {/* Bottom-right signature */}
+        {/* Bottom-right domain signature */}
         <div
           style={{
             display: "flex",

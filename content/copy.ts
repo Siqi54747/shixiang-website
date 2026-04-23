@@ -32,30 +32,38 @@ export const copy = {
     updatedLabel: "UPDATED",
     branch: "main",
     ready: "ready",
+    // Each entry links out to the WeChat public-account source article
+    // (海外独角兽). The previous /thesis/<slug> in-site detail route is
+    // deprecated — see docs/polish-todo.md for the "revive in-site
+    // thesis page" backlog item.
     entries: [
       {
         slug: "agi-labs",
         tag: "AGI Labs",
         desc: "模型能力仍是价值创造的核心变量",
         sub: "全球 Tier-1 AI Labs · Neo Labs · LLM-native Infra",
+        href: "https://mp.weixin.qq.com/s/cLyenxqPX71L0zTSy2uYGQ",
       },
       {
         slug: "robotics",
         tag: "Robotics",
         desc: "VLA 将解锁通用机器人的 ChatGPT 时刻",
         sub: "机器人硬件 · 仿真与数据 · Foundation Model for Robotics",
+        href: "https://mp.weixin.qq.com/s/n695VewySScJkJxpl9rcdg",
       },
       {
         slug: "ai-for-science",
         tag: "AI for Science",
         desc: "AI 正在重构科学发现的范式，下一个 10 亿美元分子一定来自 AI",
         sub: "AI 制药 · AI 材料 · Research Agents",
+        href: "https://mp.weixin.qq.com/s/Tn4vpyXf6S00WOEh05tpqg",
       },
       {
         slug: "agent-native",
         tag: "Agent-Native",
         desc: "Agent 是组成新的互联网，会带来软件的下一次重写",
         sub: "Coding Agent · Infra for Agent · Vertical Agent",
+        href: "https://mp.weixin.qq.com/s/9I2GccOVm_2hNzLGlaZ5_g",
       },
     ],
   },

@@ -231,6 +231,31 @@ function readUrl(v: unknown): string {
   return m ? (m[2] || m[1]) : s;
 }
 
+function normalizeDriveUrl(url: string): string {
+  // Operations fill Embed URL by pasting whatever Google Drive's
+  // share dialog gave them — which could be any of:
+  //   https://drive.google.com/file/d/<ID>/view
+  //   https://drive.google.com/file/d/<ID>/view?usp=sharing
+  //   https://drive.google.com/file/d/<ID>/view?usp=drive_link
+  //   https://drive.google.com/file/d/<ID>/edit
+  //   https://drive.google.com/file/d/<ID>/preview   (already correct)
+  //   https://drive.google.com/open?id=<ID>
+  //
+  // iframe embedding only renders reliably with the /preview form
+  // (decisions.md 2026-04-19 locked this). Canonicalize any Drive
+  // URL that carries a file ID; leave non-Drive URLs untouched.
+  if (!url) return url;
+  const pathMatch = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (pathMatch) {
+    return `https://drive.google.com/file/d/${pathMatch[1]}/preview`;
+  }
+  const openMatch = url.match(/drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/);
+  if (openMatch) {
+    return `https://drive.google.com/file/d/${openMatch[1]}/preview`;
+  }
+  return url;
+}
+
 function readCommaList(v: unknown): string[] {
   const s = readText(v);
   if (!s.trim()) return [];
@@ -339,7 +364,6 @@ interface Deck {
   quarter: string;
   publishedDate: string;
   embedUrl: string;
-  summary: string;
   featured: boolean;
   status: "draft" | "published";
   relatedSlugs?: string[];
@@ -356,7 +380,6 @@ const COL = {
   quarter: "Quarter",
   publishedDate: "Published Date",
   embedUrl: "Embed URL",
-  summary: "Summary",
   featured: "Featured",
   status: "Status",
   relatedSlugs: "Related Slugs",
@@ -375,8 +398,7 @@ function recordToDeck(record: BaseRecord): Deck {
     subtitle: readText(f[COL.subtitle]).trim(),
     quarter: readText(f[COL.quarter]).trim(),
     publishedDate: readIsoDate(f[COL.publishedDate]),
-    embedUrl: readUrl(f[COL.embedUrl]),
-    summary: readText(f[COL.summary]).trim(),
+    embedUrl: normalizeDriveUrl(readUrl(f[COL.embedUrl])),
     featured: readCheckbox(f[COL.featured]),
     status: status === "draft" ? "draft" : "published",
     ...(relatedSlugs.length > 0 ? { relatedSlugs } : {}),
@@ -398,9 +420,9 @@ function validateDecks(decks: Deck[]): void {
     }
     seenSlugs.add(d.slug);
     if (d.featured && d.status === "published") featuredPublishedCount++;
-    if (!d.title || !d.subtitle || !d.quarter || !d.publishedDate || !d.summary) {
+    if (!d.title || !d.subtitle || !d.quarter || !d.publishedDate) {
       throw new Error(
-        `Deck '${d.slug}' missing required fields (title/subtitle/quarter/publishedDate/summary)`
+        `Deck '${d.slug}' missing required fields (title/subtitle/quarter/publishedDate)`
       );
     }
   }
@@ -423,7 +445,6 @@ function serialize(decks: Deck[]): string {
     lines.push(`    quarter: ${q(d.quarter)},`);
     lines.push(`    publishedDate: ${q(d.publishedDate)},`);
     lines.push(`    embedUrl: ${q(d.embedUrl)},`);
-    lines.push(`    summary: ${q(d.summary)},`);
     lines.push(`    featured: ${d.featured},`);
     lines.push(`    status: ${q(d.status)},`);
     if (d.relatedSlugs && d.relatedSlugs.length > 0) {

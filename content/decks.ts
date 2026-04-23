@@ -4,12 +4,11 @@ export interface Deck {
   subtitle: string;     // 中文副标题
   quarter: string;      // e.g. "2026 Q1"
   publishedDate: string; // ISO "YYYY-MM-DD"
-  embedUrl: string;     // iframe-able preview URL (e.g. Google Drive /preview); 空字符串 = 未填
-  summary: string;
+  embedUrl: string;     // iframe-able preview URL (sync 脚本会归一成 Google Drive /preview 格式); 空字符串 = 未填
   featured: boolean;
   status: "draft" | "published";
   relatedSlugs?: string[];
-  intro?: string[];     // 右栏导读段落（运营产出），每段一个字符串；undefined = 显示占位文案
+  intro?: string[];     // 右栏 Reading Guide 段落（运营产出），每段一个字符串；undefined = 显示占位文案。SEO meta description 也从这里派生（取第一段）
   cover?: string;       // 封面图本地路径 (e.g. "/covers/agi-landscape.jpg")，由 sync 脚本从 Base 附件下载生成。仅 featured deck 会渲染。
 }
 
@@ -37,7 +36,6 @@ export const decks: Deck[] = [
     quarter: "2026 Q1",
     publishedDate: "2026-04-01",
     embedUrl: "https://drive.google.com/file/d/1M98axRY6TyJQhYE0Z3O102N938yMgtUP/preview",
-    summary: "全球 AGI 赛道全景梳理",
     featured: true,
     status: "published",
     intro: [
@@ -52,8 +50,7 @@ export const decks: Deck[] = [
     subtitle: "分清结构性机会与噪音",
     quarter: "2025 Q4",
     publishedDate: "2026-02-02",
-    embedUrl: "https://drive.google.com/file/d/1EliRn7QLPDRTuCt1xvsQQlu0ZqqNjTKk/view?usp=sharing",
-    summary: "AI Agent 平台变革",
+    embedUrl: "https://drive.google.com/file/d/1EliRn7QLPDRTuCt1xvsQQlu0ZqqNjTKk/preview",
     featured: false,
     status: "published",
     intro: [
@@ -74,8 +71,7 @@ export const decks: Deck[] = [
     subtitle: "分化与收敛、全家桶、Full Stack",
     quarter: "2025 Q3",
     publishedDate: "2025-08-14",
-    embedUrl: "https://drive.google.com/file/d/19Wb_D6-MmVwUScVUXFi7LPAILImtkLS6/view?usp=sharing",
-    summary: "新一代创业者的工具栈",
+    embedUrl: "https://drive.google.com/file/d/19Wb_D6-MmVwUScVUXFi7LPAILImtkLS6/preview",
     featured: false,
     status: "published",
   },
@@ -85,8 +81,7 @@ export const decks: Deck[] = [
     subtitle: "智能进步是最大的确定性",
     quarter: "2025 Q2",
     publishedDate: "2025-05-14",
-    embedUrl: "https://drive.google.com/file/d/1_H_PiCGUXGu40cud43kAUjaTFcCgCZJr/view?usp=drive_link",
-    summary: "2025 Q2 全球大模型的爆发性比以往更强，硅谷的各个模型公司开始分化到各个领域，比如除了 Google Gemini 和 OpenAI 还在做通用的模型，Anthropic 分化到 Coding、Agentic，Mira 的 Thinking Machines Lab 则分化到多模态和下一代交互。在过去 3 年，市场一直对智能上限的探索保持关注，但在刚刚过去的这两个月里，我们认为需要开始重视产品了：\n\n• 大模型在分化，当下 AI Labs 的路线选择有两个趋势：横向全家桶和纵向垂直整合，前者的例子是 ChatGPT，后者的代表是 Gemini；\n\n• 智能和产品都重要，ChatGPT 身上有很多非技术性壁垒，而 Coding 或模型公司只是技术壁垒；\n\n• 做 AI 产品很像挖矿，保鲜窗口很关键，这个窗口期明显在缩短；\n\n• ChatGPT 的 Deep Research 和 Anthropic 的 Claude Code 最早交付了 L4 级别的体验，分别对应信息搜索和软件开发；\n\n• 极端来说，Coding 公司不做模型的话，在未来是没有优势的，未来就是比拼成本。",
+    embedUrl: "https://drive.google.com/file/d/1_H_PiCGUXGu40cud43kAUjaTFcCgCZJr/preview",
     featured: false,
     status: "published",
   },

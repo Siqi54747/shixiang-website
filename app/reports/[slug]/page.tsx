@@ -20,9 +20,14 @@ export function generateStaticParams() {
 export function generateMetadata({ params }: Params) {
   const deck = getDeckBySlug(params.slug);
   if (!deck) return {};
+  // SEO description: prefer the Reading Guide's opening paragraph
+  // (human-authored) over the one-liner subtitle. Both remain fallbacks
+  // if the intro is empty — earlier drafts had a dedicated `summary`
+  // field just for this, but the intro first paragraph fills the role
+  // without duplicate editorial effort.
   return {
     title: `${deck.title} · ${copy.site.name}`,
-    description: deck.summary,
+    description: deck.intro?.[0] ?? deck.subtitle,
   };
 }
 

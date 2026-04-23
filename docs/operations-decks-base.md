@@ -37,8 +37,7 @@ Base 名字:**拾象官网 — Decks**(或任意名)
 | Subtitle (CN) | 单行文本 | ✓ | `全球 AGI 赛道全景梳理` | 中文副标题 |
 | Quarter | 单行文本 | ✓ | `2026 Q1` | 年份 + 季度,用于标签展示 |
 | Published Date | 日期 | ✓ | `2026-04-01` | 发布日期,列表排序按这个字段倒序 |
-| Embed URL | 超链接(或文本) |   | `https://drive.google.com/file/d/XXXX/preview` | Google Drive **预览链接**,格式 `/preview` 结尾。留空 = 列表页显示 "Coming Soon",不可点 |
-| Summary | 单行文本 | ✓ | `全球 AGI 赛道全景梳理` | 列表页一行概述(通常和 Subtitle 相同或更短) |
+| Embed URL | 超链接(或文本) |   | `https://drive.google.com/file/d/XXXX/preview` | Google Drive 分享链接随便哪种格式都行(`/view` / `/view?usp=sharing` / `/preview` / `open?id=`),sync 脚本会自动归一成 `/preview`。留空 = 列表页显示 "Coming Soon",不可点 |
 | Featured | 复选框 | ✓ | ☑ | 同一时刻**只能有一条** featured + published 的 deck。勾选的那条会在首页露出 |
 | Status | 单选 | ✓ | `published` / `draft` | 只有 `published` 会上线;`draft` 不进 git,不部署 |
 | Related Slugs | 多行文本 |   | `ai-agents-2025-q4, robotics-next-decade-2025-q3` | 逗号分隔,填其他 deck 的 slug。详情页底部 "Related Reports" 用这个;留空会自动取最新的 2 条 |

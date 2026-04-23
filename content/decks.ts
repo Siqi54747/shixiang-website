@@ -4,8 +4,6 @@ export interface Deck {
   subtitle: string;     // 中文副标题
   quarter: string;      // e.g. "2026 Q1"
   publishedDate: string; // ISO "YYYY-MM-DD"
-  pages: number;
-  readingTime?: string; // e.g. "30 min"
   embedUrl: string;     // iframe-able preview URL (e.g. Google Drive /preview); 空字符串 = 未填
   summary: string;
   featured: boolean;
@@ -37,8 +35,6 @@ export const decks: Deck[] = [
     subtitle: "全球 AGI 赛道全景梳理",
     quarter: "2026 Q1",
     publishedDate: "2026-04-01",
-    pages: 48,
-    readingTime: "30 min",
     embedUrl: "https://drive.google.com/file/d/1M98axRY6TyJQhYE0Z3O102N938yMgtUP/preview",
     summary: "全球 AGI 赛道全景梳理",
     featured: true,
@@ -55,8 +51,6 @@ export const decks: Deck[] = [
     subtitle: "AI Agent 平台变革",
     quarter: "2025 Q4",
     publishedDate: "2025-10-01",
-    pages: 42,
-    readingTime: "25 min",
     embedUrl: "",
     summary: "AI Agent 平台变革",
     featured: false,
@@ -68,8 +62,6 @@ export const decks: Deck[] = [
     subtitle: "硬件与软件的双重革命",
     quarter: "2025 Q3",
     publishedDate: "2025-07-01",
-    pages: 36,
-    readingTime: "22 min",
     embedUrl: "",
     summary: "硬件与软件的双重革命",
     featured: false,
@@ -81,8 +73,6 @@ export const decks: Deck[] = [
     subtitle: "新一代创业者的工具栈",
     quarter: "2025 Q2",
     publishedDate: "2025-04-01",
-    pages: 28,
-    readingTime: "18 min",
     embedUrl: "",
     summary: "新一代创业者的工具栈",
     featured: false,

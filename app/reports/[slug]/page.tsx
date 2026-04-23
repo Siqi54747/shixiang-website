@@ -30,10 +30,6 @@ export default function ReportDetailPage({ params }: Params) {
   const deck = getDeckBySlug(params.slug);
   if (!deck) return notFound();
 
-  const meta = deck.readingTime
-    ? `By 拾象投研团队 · ${deck.pages} pages · ${deck.readingTime} read`
-    : `By 拾象投研团队 · ${deck.pages} pages`;
-
   return (
     <article className="px-6 md:px-24 py-6 md:py-8">
       <Link
@@ -51,7 +47,7 @@ export default function ReportDetailPage({ params }: Params) {
         {deck.title}
       </h1>
 
-      <p className="mt-3 text-[14px] text-muted">{meta}</p>
+      <p className="mt-3 text-[14px] text-muted">By 拾象投研团队</p>
 
       <div className="mt-6 flex flex-col gap-8 lg:grid lg:grid-cols-3 lg:gap-12 lg:items-start">
         {/* Left column: iframe + share bar centered beneath it.

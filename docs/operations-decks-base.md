@@ -37,8 +37,6 @@ Base 名字:**拾象官网 — Decks**(或任意名)
 | Subtitle (CN) | 单行文本 | ✓ | `全球 AGI 赛道全景梳理` | 中文副标题 |
 | Quarter | 单行文本 | ✓ | `2026 Q1` | 年份 + 季度,用于标签展示 |
 | Published Date | 日期 | ✓ | `2026-04-01` | 发布日期,列表排序按这个字段倒序 |
-| Pages | 数字 | ✓ | `48` | deck 页数 |
-| Reading Time | 单行文本 |   | `30 min` | 可空;填了会在详情页显示 |
 | Embed URL | 超链接(或文本) |   | `https://drive.google.com/file/d/XXXX/preview` | Google Drive **预览链接**,格式 `/preview` 结尾。留空 = 列表页显示 "Coming Soon",不可点 |
 | Summary | 单行文本 | ✓ | `全球 AGI 赛道全景梳理` | 列表页一行概述(通常和 Subtitle 相同或更短) |
 | Featured | 复选框 | ✓ | ☑ | 同一时刻**只能有一条** featured + published 的 deck。勾选的那条会在首页露出 |

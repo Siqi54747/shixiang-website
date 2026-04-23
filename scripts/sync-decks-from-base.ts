@@ -154,13 +154,6 @@ function readText(v: unknown): string {
   return "";
 }
 
-function readNumber(v: unknown): number {
-  if (typeof v === "number") return v;
-  const s = readText(v);
-  const n = parseInt(s, 10);
-  return Number.isFinite(n) ? n : 0;
-}
-
 function readIsoDate(v: unknown): string {
   // Base date fields come as ms-epoch numbers
   if (typeof v === "number") {
@@ -215,8 +208,6 @@ interface Deck {
   subtitle: string;
   quarter: string;
   publishedDate: string;
-  pages: number;
-  readingTime?: string;
   embedUrl: string;
   summary: string;
   featured: boolean;
@@ -233,8 +224,6 @@ const COL = {
   subtitle: "Subtitle (CN)",
   quarter: "Quarter",
   publishedDate: "Published Date",
-  pages: "Pages",
-  readingTime: "Reading Time",
   embedUrl: "Embed URL",
   summary: "Summary",
   featured: "Featured",
@@ -246,7 +235,6 @@ const COL = {
 function recordToDeck(record: BaseRecord): Deck {
   const f = record.fields;
   const status = readSingleSelect(f[COL.status]).toLowerCase();
-  const readingTime = readText(f[COL.readingTime]).trim();
   const relatedSlugs = readCommaList(f[COL.relatedSlugs]);
 
   return {
@@ -255,8 +243,6 @@ function recordToDeck(record: BaseRecord): Deck {
     subtitle: readText(f[COL.subtitle]).trim(),
     quarter: readText(f[COL.quarter]).trim(),
     publishedDate: readIsoDate(f[COL.publishedDate]),
-    pages: readNumber(f[COL.pages]),
-    ...(readingTime ? { readingTime } : {}),
     embedUrl: readText(f[COL.embedUrl]).trim(),
     summary: readText(f[COL.summary]).trim(),
     featured: readCheckbox(f[COL.featured]),
@@ -304,8 +290,6 @@ function serialize(decks: Deck[]): string {
     lines.push(`    subtitle: ${q(d.subtitle)},`);
     lines.push(`    quarter: ${q(d.quarter)},`);
     lines.push(`    publishedDate: ${q(d.publishedDate)},`);
-    lines.push(`    pages: ${d.pages},`);
-    if (d.readingTime) lines.push(`    readingTime: ${q(d.readingTime)},`);
     lines.push(`    embedUrl: ${q(d.embedUrl)},`);
     lines.push(`    summary: ${q(d.summary)},`);
     lines.push(`    featured: ${d.featured},`);

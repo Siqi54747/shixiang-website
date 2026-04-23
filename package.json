@@ -8,7 +8,8 @@
     "start": "next start",
     "preview": "next build && next start",
     "lint": "next lint",
-    "sync:decks": "tsx scripts/sync-decks-from-base.ts"
+    "sync:decks": "tsx scripts/sync-decks-from-base.ts",
+    "publish:decks": "bash scripts/publish-decks.sh"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",

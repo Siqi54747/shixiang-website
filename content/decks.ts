@@ -8,8 +8,9 @@ export interface Deck {
   featured: boolean;
   status: "draft" | "published";
   relatedSlugs?: string[];
-  intro?: string[];     // 右栏 Reading Guide 段落（运营产出），每段一个字符串；undefined = 显示占位文案。SEO meta description 也从这里派生（取第一段）
+  intro?: string[];     // 右栏 Reading Guide 段落（运营产出），每段一个字符串；undefined = 显示占位文案
   cover?: string;       // 封面图本地路径 (e.g. "/covers/agi-landscape.jpg")，由 sync 脚本从 Base 附件下载生成。仅 featured deck 会渲染。
+  summary?: string;     // 可选 SEO meta description override。留空时 generateMetadata 回退到 intro[0]，再回退到 subtitle。建议 ≤150 字符。
 }
 
 /**
@@ -43,6 +44,7 @@ export const decks: Deck[] = [
       "我们重点关注三条主线：Coding 能力加速向自主 Agent 演进、战略组织与文化如何决定第二增长曲线、智能通缩在下游应用层的兑现节奏。",
       "数据截止 2026 年 3 月，覆盖样本超过 200 家公司。建议先看第 12–18 页的市场结构图和第 30–36 页的投资地图，再回头读完整论述。",
     ],
+    summary: "全球 AGI 赛道全景梳理",
   },
   {
     slug: "How-to-play-ai-beta",
@@ -64,6 +66,7 @@ export const decks: Deck[] = [
       "5. 一个理想的 AGI Basket：Google，Nvidia，OpenAI，Anthropic，ByteDance 和 TSMC；",
       "6. 模型即产品，数据即模型，阶跃式的产品体验提升往往还是来自于底层的模型换代，模型能力提升背后仍是数据 bet。",
     ],
+    summary: "AI Agent 平台变革",
   },
   {
     slug: "founder-notes-ai-native-2025-q2",
@@ -74,6 +77,7 @@ export const decks: Deck[] = [
     embedUrl: "https://drive.google.com/file/d/19Wb_D6-MmVwUScVUXFi7LPAILImtkLS6/preview",
     featured: false,
     status: "published",
+    summary: "新一代创业者的工具栈",
   },
   {
     slug: "agi-road-map-2025",
@@ -84,6 +88,7 @@ export const decks: Deck[] = [
     embedUrl: "https://drive.google.com/file/d/1_H_PiCGUXGu40cud43kAUjaTFcCgCZJr/preview",
     featured: false,
     status: "published",
+    summary: "2025 Q2 全球大模型的爆发性比以往更强，硅谷的各个模型公司开始分化到各个领域，比如除了 Google Gemini 和 OpenAI 还在做通用的模型，Anthropic 分化到 Coding、Agentic，Mira 的 Thinking Machines Lab 则分化到多模态和下一代交互。在过去 3 年，市场一直对智能上限的探索保持关注，但在刚刚过去的这两个月里，我们认为需要开始重视产品了：\n\n• 大模型在分化，当下 AI Labs 的路线选择有两个趋势：横向全家桶和纵向垂直整合，前者的例子是 ChatGPT，后者的代表是 Gemini；\n\n• 智能和产品都重要，ChatGPT 身上有很多非技术性壁垒，而 Coding 或模型公司只是技术壁垒；\n\n• 做 AI 产品很像挖矿，保鲜窗口很关键，这个窗口期明显在缩短；\n\n• ChatGPT 的 Deep Research 和 Anthropic 的 Claude Code 最早交付了 L4 级别的体验，分别对应信息搜索和软件开发；\n\n• 极端来说，Coding 公司不做模型的话，在未来是没有优势的，未来就是比拼成本。",
   },
 ];
 // SYNC:END

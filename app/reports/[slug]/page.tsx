@@ -20,14 +20,15 @@ export function generateStaticParams() {
 export function generateMetadata({ params }: Params) {
   const deck = getDeckBySlug(params.slug);
   if (!deck) return {};
-  // SEO description: prefer the Reading Guide's opening paragraph
-  // (human-authored) over the one-liner subtitle. Both remain fallbacks
-  // if the intro is empty — earlier drafts had a dedicated `summary`
-  // field just for this, but the intro first paragraph fills the role
-  // without duplicate editorial effort.
+  // SEO description priority:
+  //   1. explicit `summary` (ops-authored one-liner tuned for search)
+  //   2. first paragraph of the Reading Guide
+  //   3. the CN subtitle as a last-resort fallback
+  // Ops can leave Summary empty on most decks and only fill it when a
+  // bespoke meta description improves discoverability.
   return {
     title: `${deck.title} · ${copy.site.name}`,
-    description: deck.intro?.[0] ?? deck.subtitle,
+    description: deck.summary ?? deck.intro?.[0] ?? deck.subtitle,
   };
 }
 

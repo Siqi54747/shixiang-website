@@ -369,6 +369,7 @@ interface Deck {
   relatedSlugs?: string[];
   intro?: string[];
   cover?: string;
+  summary?: string;
 }
 
 // Base column-name → Deck field mapping. Keep in sync with
@@ -385,12 +386,14 @@ const COL = {
   relatedSlugs: "Related Slugs",
   intro: "Intro",
   cover: "Cover",
+  summary: "Summary",
 } as const;
 
 function recordToDeck(record: BaseRecord): Deck {
   const f = record.fields;
   const status = readSingleSelect(f[COL.status]).toLowerCase();
   const relatedSlugs = readCommaList(f[COL.relatedSlugs]);
+  const summary = readText(f[COL.summary]).trim();
 
   return {
     slug: readText(f[COL.slug]).trim(),
@@ -403,6 +406,7 @@ function recordToDeck(record: BaseRecord): Deck {
     status: status === "draft" ? "draft" : "published",
     ...(relatedSlugs.length > 0 ? { relatedSlugs } : {}),
     intro: readParagraphs(f[COL.intro]),
+    ...(summary ? { summary } : {}),
   };
 }
 
@@ -458,6 +462,7 @@ function serialize(decks: Deck[]): string {
       lines.push(`    ],`);
     }
     if (d.cover) lines.push(`    cover: ${q(d.cover)},`);
+    if (d.summary) lines.push(`    summary: ${q(d.summary)},`);
     lines.push("  },");
   }
   return lines.join("\n");

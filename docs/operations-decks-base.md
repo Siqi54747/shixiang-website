@@ -38,6 +38,7 @@ Base 名字:**拾象官网 — Decks**(或任意名)
 | Quarter | 单行文本 | ✓ | `2026 Q1` | 年份 + 季度,用于标签展示 |
 | Published Date | 日期 | ✓ | `2026-04-01` | 发布日期,列表排序按这个字段倒序 |
 | Embed URL | 超链接(或文本) |   | `https://drive.google.com/file/d/XXXX/preview` | Google Drive 分享链接随便哪种格式都行(`/view` / `/view?usp=sharing` / `/preview` / `open?id=`),sync 脚本会自动归一成 `/preview`。留空 = 列表页显示 "Coming Soon",不可点 |
+| Summary | 单行文本 |   | `全球 AGI 赛道全景梳理,覆盖 OpenAI / Anthropic / Google DeepMind 三家动向。` | **可选**。只为 SEO 想写一段 ≤150 字符的专门描述时才填。留空时网站回退到 Intro 第一段,再回退到 Subtitle。不在页面正文里显示,只出现在 Google / 微信分享卡的描述位 |
 | Featured | 复选框 | ✓ | ☑ | 同一时刻**只能有一条** featured + published 的 deck。勾选的那条会在首页露出 |
 | Status | 单选 | ✓ | `published` / `draft` | 只有 `published` 会上线;`draft` 不进 git,不部署 |
 | Related Slugs | 多行文本 |   | `ai-agents-2025-q4, robotics-next-decade-2025-q3` | 逗号分隔,填其他 deck 的 slug。详情页底部 "Related Reports" 用这个;留空会自动取最新的 2 条 |
@@ -127,17 +128,34 @@ Sync 脚本直接借用本机 `lark-cli` 已登录的 **user 身份**(目前是 
 
 > ℹ️ 为什么不走 tenant token(bot 身份):`cli_*` 开头的 lark-cli 内建应用不能作为"文档应用"加进 Base 的协作人列表 —— 飞书文档应用只接受在开放平台正式创建并发布的业务应用。我们不需要这层抽象,sync 永远是本地手动跑,piggyback user 身份更简单。
 
-### 每次运营改完后
+### 每次运营改完后 —— 一键命令
 
 ```bash
-npm run sync:decks
-git diff content/decks.ts    # 肉眼过一遍,确认改动符合预期
-git add content/decks.ts
-git commit -m "content: sync decks from Base ($(date +%Y-%m-%d))"
+cd ~/Documents/SIQI\ Work/SX/shixiang-website
+npm run publish:decks
+```
+
+这一条命令顺序做 4 件事:
+1. `sync:decks` 把 Base 数据拉下来,更新 `content/decks.ts` + `public/covers/`
+2. 如果没变化,退出(不 commit 不 push)
+3. 打印 diff summary 供肉眼过一眼
+4. `git add` + `git commit` + `git push origin main`
+
+Vercel 检测到 push,~90s 线上生效,URL:
+https://shixiang-website-ten.vercel.app/reports
+
+<details>
+<summary>想分步执行/预览 diff 后再决定?</summary>
+
+```bash
+npm run sync:decks               # 只拉不提交
+git diff content/decks.ts        # 看改了啥
+git add content/decks.ts public/covers/
+git commit -m "content: sync decks from Base"
 git push
 ```
 
-Vercel 检测到 push,自动部署。~90s 后线上生效。
+</details>
 
 ### 常见报错
 

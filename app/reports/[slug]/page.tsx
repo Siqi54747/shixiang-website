@@ -26,9 +26,23 @@ export function generateMetadata({ params }: Params) {
   //   3. the CN subtitle as a last-resort fallback
   // Ops can leave Summary empty on most decks and only fill it when a
   // bespoke meta description improves discoverability.
+  const description = deck.summary ?? deck.intro?.[0] ?? deck.subtitle;
+  const ogUrl = `/api/og?slug=${encodeURIComponent(deck.slug)}`;
   return {
     title: `${deck.title} · ${copy.site.name}`,
-    description: deck.summary ?? deck.intro?.[0] ?? deck.subtitle,
+    description,
+    openGraph: {
+      title: deck.title,
+      description,
+      images: [{ url: ogUrl, width: 1200, height: 630, alt: deck.title }],
+      type: "article",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: deck.title,
+      description,
+      images: [ogUrl],
+    },
   };
 }
 

@@ -7,6 +7,18 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: `${copy.site.name} · ${copy.site.tagline}`,
   description: copy.site.description,
+  openGraph: {
+    title: `${copy.site.name} · ${copy.site.tagline}`,
+    description: copy.site.description,
+    images: [{ url: "/api/og", width: 1200, height: 630, alt: copy.site.name }],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${copy.site.name} · ${copy.site.tagline}`,
+    description: copy.site.description,
+    images: ["/api/og"],
+  },
 };
 
 export default function RootLayout({

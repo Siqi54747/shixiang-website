@@ -17,7 +17,16 @@
 
 ### [ ] 补齐其他 3 条 deck 的 Google Drive URL + intro 段落
 - **状态**:等运营交付(ai-agents / robotics / founder-notes)
-- **落地**:收到后直接填 `content/decks.ts` 对应条目的 `embedUrl` 和 `intro` 字段。`embedUrl` 空 → 列表页自动渲染 "Coming Soon"
+- **新 workflow**(2026-04-23 起 CMS 切飞书 Base):运营在 Base 里直接填对应 record 的 Embed URL 和 Intro 字段,然后通知开发跑 `npm run sync:decks` → commit → push。详见 `docs/operations-decks-base.md`
+- **前置动作**:Base 建表 + 填初始 4 条数据 + Vercel env 配 4 个 LARK_* 变量(见下一项)
+
+### [ ] Reports CMS:飞书 Base 上线前置
+- **状态**:代码 pipeline 已就绪(commit `scripts/sync-decks-from-base.ts`),等 3 项动作
+  1. 拾象飞书租户下建自建应用,拿 `app_id` + `app_secret`,开通 `bitable:app:readonly` scope
+  2. 建 "拾象官网 — Decks" Base,按 `docs/operations-decks-base.md` 的 schema 加 13 列,把现有 4 条 deck 数据录入
+  3. `.env.local` 填 4 个 LARK_* 变量,本地跑一次 `npm run sync:decks` 验证,diff 不变化(因为数据一样) = 通过
+- **验收**:运营改一个测试字段(比如 Intro 加一句)→ sync → 线上看到变化 = pipeline 走通
+- **落地手册**:`docs/operations-decks-base.md`
 
 ### [ ] OG 图
 - **状态**:待办
@@ -68,6 +77,15 @@
 ### [ ] Reports 详情页样式再审
 - **状态**:handoff 时已 settle(`852d0ed` 的 2:1 + 16:9),但新增内容后要复核
 - **触发**:其他 3 条 deck 的 embed 都有了之后,统一看一遍对不对齐
+
+### [ ] Webhook 触发 Vercel rebuild(reports CMS 自动化升级)
+- **状态**:2026-04-23 决策暂不做,记账
+- **触发条件**:季度 deck 发布频率涨到 4+ / 运营要求"改完 Base 不用找开发"
+- **落地**:
+  - Vercel project → Git → Deploy Hooks 生成一个 URL
+  - 飞书 Base → 自动化流程 → 记录变更 → HTTP 请求 该 URL
+  - build 时加 prebuild: `"prebuild": "npm run sync:decks || true"`(`|| true` 确保 API 挂不阻塞)
+- **风险**:飞书 API 参与部署路径,需要完整的 error 处理和 fallback 机制
 
 ### [ ] About 页
 - **状态**:2026-04-19 决策**不做**,此处仅为记账。如果未来需求反转再评估

@@ -349,3 +349,68 @@ DocSend embed 依赖第三方 cookie 追踪访客 + 校验 email gate。2026 年
 - 未完成的 polish 见 `polish-todo.md` P2 对应条目（侧栏 TOC / 子章节层级 / prose-img border / figure caption）
 - 触发条件见同文件 P2
 
+---
+
+## 2026-04-23: Reports 内容层切到飞书多维表格(Lark Base)
+
+### 决策
+
+`/reports` 列表页和 `/reports/<slug>` 详情页的内容从"开发手改 `content/decks.ts`"迁到**飞书 Lark Base 作为单一编辑入口**。运营在 Base 里维护所有字段,开发或自己跑 `npm run sync:decks` 把 Base → TS 源拉下来,`git commit` + `push` 触发 Vercel 部署。
+
+### 上下文 / 与 2026-04-21 CMS 决策的关系
+
+2026-04-21 决策"不换 CMS"的判断基于 **thesis 场景**:内容 source 是 UO-articles 400 段长文 archive,切 CMS 要手工清洗 400+ 段落,markdown pipeline 已经能兜住全部 quirk。
+
+Reports 场景不同:
+- 数据形态是**结构化字段**(13 个字段,1 个富文本多段落)——天然适合表格
+- 内容是**新创作**而非 import,没有"清洗 400 段"的成本
+- 频率是季度 1-4 份,发布流程有**运营审核** → **开发部署** 的二人配合
+- 运营(Penny)已经生活在飞书生态里,Base 零学习成本
+
+结论:同一个项目里,thesis 继续用 markdown 文件 + 外链公众号原文(见 2026-04-23 第一条),reports 切 Base。CMS 策略对"按数据形态分场景挑工具"。
+
+### 候选对比与取舍
+
+| 方案 | 淘汰原因 |
+|---|---|
+| Notion DB | 富文本→HTML 转换有坑;运营要多开一个 SaaS |
+| Sanity Studio | 过度工程,季度 1-4 份 deck 不值得搭 Studio 的成本 |
+| Google Sheets | 字段 OK,但 Intro 多段富文本在 Sheets 里编辑体验差 |
+| 继续手改 TS 文件 | 运营写好发给开发、开发代填,不可持续 |
+| **飞书 Base** | ✅ 选定 |
+
+### 架构
+
+```
+[运营在 Base 编辑]
+        ↓
+[npm run sync:decks] ← 手动触发,不在 Vercel build 阶段
+        ↓  (拉 records → 校验 → 生成 TS)
+[content/decks.ts 的 SYNC:START/END 之间被重写]
+        ↓
+[git commit + push]
+        ↓
+[Vercel 自动部署]
+```
+
+**刻意不用 prebuild / webhook 自动触发**:飞书 API 可达性不参与部署健康度。build 阶段调外部 API = 部署被绑死在外部服务的 SLA 上,对拾象这个体量不划算。手动触发的代价只是 `npm run sync:decks` 一条命令。
+
+### 实现细节
+
+- **Base schema**:13 字段表,见 `docs/operations-decks-base.md` 对照表
+- **同步脚本**:`scripts/sync-decks-from-base.ts`(tsx 运行,native `fetch`,无 SDK 依赖)
+- **sentinel**:`content/decks.ts` 里用 `// SYNC:START` / `// SYNC:END` 包住 `decks` 数组;sync 只替换这两行之间的内容,`Deck` interface 和所有 helper 函数都手写,不会被覆盖
+- **校验**:slug 去重 / 必填字段 / 同一时刻只能有 1 条 featured+published
+- **fallback**:无 env / API fail → 退出 1 报错,不污染 git working tree
+
+### 未变
+
+- `Deck` interface 保留原样(13 字段),消费方 `app/reports/*` 一行不动
+- `content/decks.ts` 仍然是 git-tracked 的源,Vercel 只消费它
+- 如果 sync 脚本有 bug,线上部署不受影响(只影响下次同步)
+
+### 未来升级路径(不做,记账)
+
+- **webhook 自动触发 Vercel rebuild**:运营 Base 改完即时反映到线上。代价:Vercel deploy hook URL + 飞书 webhook 配置。触发条件:季度 4+ 篇节奏时或运营要求实时
+- **字段扩展**:加 `author` / `downloadCount` / `tags` 等,Base 先加列 → sync 脚本加 getter → `Deck` interface 加字段
+

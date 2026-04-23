@@ -15,9 +15,21 @@ export interface Deck {
 }
 
 /**
- * 一期用本地数据。后续 Phase D 切到飞书 Lark Base。
- * 约定：同一时刻 featured=true 且 status=published 的只能有一条。
+ * 数据源:飞书多维表格(Lark Base)——"Decks" 表。
+ *
+ * 运营在 Base 里维护所有字段,开发(或自己)跑 `npm run sync:decks`
+ * 从 Base 拉最新覆盖下面 SYNC:START/END 之间的 `decks` 数组,然后
+ * `git diff` 看过 → commit → push → Vercel 自动部署。
+ *
+ * 为什么不在 Vercel build 时拉:build 阶段调外部 API 会让 deploy
+ * 健康度绑死在飞书 API 可达性上。手动触发 sync 把"内容更新"和
+ * "部署"解耦,更稳;代价是每次 Base 改完要有人跑一下命令。
+ *
+ * 运营手册:docs/operations-decks-base.md
+ *
+ * 约定:同一时刻 featured=true 且 status=published 的 deck 只能有一条。
  */
+// SYNC:START — `decks` array synced from 飞书 Lark Base, do not edit by hand
 export const decks: Deck[] = [
   {
     slug: "the-new-agi-landscape-2026-q1",
@@ -77,6 +89,7 @@ export const decks: Deck[] = [
     status: "published",
   },
 ];
+// SYNC:END
 
 const MONTHS = [
   "January", "February", "March", "April", "May", "June",

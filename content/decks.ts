@@ -123,6 +123,25 @@ export function getDeckBySlug(slug: string): Deck | undefined {
   return getPublishedDecks().find((d) => d.slug === slug);
 }
 
+/**
+ * Derive a Google Drive thumbnail URL from a deck's embedUrl.
+ *
+ * Drive exposes `drive.google.com/thumbnail?id=...&sz=wN` as a public
+ * PNG of the PDF's first page, no auth required as long as the file
+ * is shared "Anyone with the link". Used as the OG image source for
+ * deck share cards — every deck gets a real cover automatically,
+ * zero ops upload step.
+ *
+ * Returns undefined for empty or non-Drive embedUrls so callers can
+ * fall back to /api/og or another source.
+ */
+export function getDriveThumbnailUrl(deck: Deck, sizePx = 1600): string | undefined {
+  if (!deck.embedUrl) return undefined;
+  const m = deck.embedUrl.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (!m) return undefined;
+  return `https://drive.google.com/thumbnail?id=${m[1]}&sz=w${sizePx}`;
+}
+
 export function getRelatedDecks(deck: Deck, limit = 2): Deck[] {
   const all = getPublishedDecks().filter((d) => d.slug !== deck.slug);
   if (deck.relatedSlugs && deck.relatedSlugs.length > 0) {

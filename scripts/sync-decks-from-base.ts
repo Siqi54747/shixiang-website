@@ -324,9 +324,14 @@ function downloadCover(
         : nameExt
       : "jpg";
 
+  // lark-cli's --output rejects absolute paths ("unsafe output path"
+  // error), so we hand it a cwd-relative path and let the shell-out
+  // resolve from wherever sync-decks was invoked. npm scripts always
+  // run from the repo root so `public/covers/...` resolves correctly.
   const outDir = resolve("public/covers");
   if (!existsSync(outDir)) mkdirSync(outDir, { recursive: true });
-  const outPath = resolve(outDir, `${slug}.${ext}`);
+  const relOutPath = `public/covers/${slug}.${ext}`;
+  const absOutPath = resolve(relOutPath);
 
   try {
     larkCli([
@@ -336,7 +341,7 @@ function downloadCover(
       "--as",
       "user",
       "-o",
-      outPath,
+      relOutPath,
     ]);
   } catch (err) {
     console.warn(
@@ -345,13 +350,13 @@ function downloadCover(
     return undefined;
   }
 
-  if (!existsSync(outPath)) {
+  if (!existsSync(absOutPath)) {
     console.warn(
-      `[sync-decks] cover download for '${slug}' produced no file at ${outPath}`
+      `[sync-decks] cover download for '${slug}' produced no file at ${absOutPath}`
     );
     return undefined;
   }
-  console.log(`[sync-decks] cover downloaded: ${outPath}`);
+  console.log(`[sync-decks] cover downloaded: ${absOutPath}`);
   return `/covers/${slug}.${ext}`;
 }
 

@@ -19,20 +19,33 @@ export default function ReportsListPage() {
           <div className="lg:sticky lg:top-[74px] self-start">
             <Link
               href={`/reports/${featured.slug}`}
-              className="block bg-obsidian text-cream rounded-sm px-10 md:px-12 py-10 md:py-12 group"
+              className="block bg-obsidian text-cream rounded-sm overflow-hidden group"
             >
-              <p className="text-[11px] tracking-label uppercase text-cream/60">
-                {featured.quarter} · {copy.reportsList.featuredEyebrow}
-              </p>
-              <h2 className="font-serif text-[44px] md:text-[56px] leading-[1.05] mt-14 md:mt-20">
-                {featured.title}
-              </h2>
-              <p className="font-serif text-[18px] md:text-[22px] text-cream/70 mt-14 md:mt-20">
-                {featured.subtitle}
-              </p>
-              <span className="inline-block mt-10 md:mt-16 text-[14px] border-b border-cream pb-[4px] group-hover:border-crimson group-hover:text-crimson transition-colors">
-                {copy.reportsList.featuredCta}
-              </span>
+              {featured.cover && (
+                // Optional cover image; flush to the card edges above the
+                // content padding. 16:9 matches the Google Drive preview
+                // aspect the detail page iframe will render.
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={featured.cover}
+                  alt={featured.title}
+                  className="block w-full aspect-[16/9] object-cover"
+                />
+              )}
+              <div className="px-10 md:px-12 py-10 md:py-12">
+                <p className="text-[11px] tracking-label uppercase text-cream/60">
+                  {featured.quarter} · {copy.reportsList.featuredEyebrow}
+                </p>
+                <h2 className="font-serif text-[44px] md:text-[56px] leading-[1.05] mt-14 md:mt-20">
+                  {featured.title}
+                </h2>
+                <p className="font-serif text-[18px] md:text-[22px] text-cream/70 mt-14 md:mt-20">
+                  {featured.subtitle}
+                </p>
+                <span className="inline-block mt-10 md:mt-16 text-[14px] border-b border-cream pb-[4px] group-hover:border-crimson group-hover:text-crimson transition-colors">
+                  {copy.reportsList.featuredCta}
+                </span>
+              </div>
             </Link>
           </div>
         )}

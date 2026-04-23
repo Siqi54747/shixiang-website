@@ -29,7 +29,7 @@
  * human workflow.
  */
 
-import { readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 // ----- env ---------------------------------------------------------------
@@ -200,6 +200,87 @@ function readParagraphs(v: unknown): string[] | undefined {
   return paras.length > 0 ? paras : undefined;
 }
 
+interface AttachmentRef {
+  file_token: string;
+  name: string;
+  type?: string;
+}
+
+function readFirstAttachment(v: unknown): AttachmentRef | undefined {
+  if (!Array.isArray(v) || v.length === 0) return undefined;
+  const first = v[0];
+  if (!first || typeof first !== "object") return undefined;
+  const ft = (first as { file_token?: unknown }).file_token;
+  if (typeof ft !== "string" || !ft) return undefined;
+  return {
+    file_token: ft,
+    name: String((first as { name?: unknown }).name ?? ""),
+    type: typeof (first as { type?: unknown }).type === "string"
+      ? ((first as { type?: string }).type as string)
+      : undefined,
+  };
+}
+
+/**
+ * Download a cover attachment to public/covers/<slug>.<ext>.
+ *
+ * Uses Lark's drive media download endpoint; tenant access token has
+ * read permission because the Lark app is a collaborator on the Base.
+ *
+ * File extension strategy:
+ *   1. Prefer the extension from the attachment's original `name` (if any).
+ *   2. Fall back to sniffing the Content-Type.
+ *   3. Default to `.jpg` if nothing matches.
+ *
+ * Returns the public path (`/covers/<slug>.<ext>`) on success, or
+ * undefined on failure (warn logged, not thrown — a missing cover
+ * should never block the sync of the remaining data).
+ */
+async function downloadCover(
+  token: string,
+  attachment: AttachmentRef,
+  slug: string
+): Promise<string | undefined> {
+  const url = `${LARK_BASE_URL}/drive/v1/medias/${encodeURIComponent(
+    attachment.file_token
+  )}/download`;
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    console.warn(
+      `[sync-decks] cover download failed for '${slug}': HTTP ${res.status}`
+    );
+    return undefined;
+  }
+  const ctype = (res.headers.get("content-type") ?? "").toLowerCase();
+  const nameExt = attachment.name.match(/\.([a-zA-Z0-9]+)$/)?.[1]?.toLowerCase();
+  const ext =
+    nameExt && /^(jpg|jpeg|png|webp|gif|avif)$/.test(nameExt)
+      ? nameExt === "jpeg"
+        ? "jpg"
+        : nameExt
+      : ctype.includes("png")
+      ? "png"
+      : ctype.includes("webp")
+      ? "webp"
+      : ctype.includes("gif")
+      ? "gif"
+      : ctype.includes("avif")
+      ? "avif"
+      : "jpg";
+
+  const outDir = resolve("public/covers");
+  if (!existsSync(outDir)) mkdirSync(outDir, { recursive: true });
+  const outPath = resolve(outDir, `${slug}.${ext}`);
+  const buf = Buffer.from(await res.arrayBuffer());
+  writeFileSync(outPath, buf);
+  console.log(
+    `[sync-decks] cover downloaded: ${outPath} (${buf.length} bytes)`
+  );
+  return `/covers/${slug}.${ext}`;
+}
+
 // ----- Deck shape (matches content/decks.ts Deck interface) --------------
 
 interface Deck {
@@ -214,6 +295,7 @@ interface Deck {
   status: "draft" | "published";
   relatedSlugs?: string[];
   intro?: string[];
+  cover?: string;
 }
 
 // Base column-name → Deck field mapping. Keep in sync with
@@ -230,6 +312,7 @@ const COL = {
   status: "Status",
   relatedSlugs: "Related Slugs",
   intro: "Intro",
+  cover: "Cover",
 } as const;
 
 function recordToDeck(record: BaseRecord): Deck {
@@ -304,6 +387,7 @@ function serialize(decks: Deck[]): string {
       for (const p of d.intro) lines.push(`      ${q(p)},`);
       lines.push(`    ],`);
     }
+    if (d.cover) lines.push(`    cover: ${q(d.cover)},`);
     lines.push("  },");
   }
   return lines.join("\n");
@@ -350,6 +434,17 @@ async function main() {
 
   const decks = records.map(recordToDeck);
   validateDecks(decks);
+
+  // Pair each record back to its deck so we can pull the Cover
+  // attachment column (non-primitive, handled outside recordToDeck).
+  // Serial, not parallel — no good reason to hammer the drive API
+  // and we're downloading a handful of files at most.
+  for (let i = 0; i < records.length; i++) {
+    const att = readFirstAttachment(records[i].fields[COL.cover]);
+    if (!att) continue;
+    const localPath = await downloadCover(token, att, decks[i].slug);
+    if (localPath) decks[i].cover = localPath;
+  }
 
   // Sort newest first — matches getPublishedDecks() default ordering
   decks.sort((a, b) => (a.publishedDate < b.publishedDate ? 1 : -1));

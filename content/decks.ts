@@ -10,6 +10,7 @@ export interface Deck {
   status: "draft" | "published";
   relatedSlugs?: string[];
   intro?: string[];     // 右栏导读段落（运营产出），每段一个字符串；undefined = 显示占位文案
+  cover?: string;       // 封面图本地路径 (e.g. "/covers/agi-landscape.jpg")，由 sync 脚本从 Base 附件下载生成。仅 featured deck 会渲染。
 }
 
 /**

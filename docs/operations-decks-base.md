@@ -43,6 +43,7 @@ Base 名字:**拾象官网 — Decks**(或任意名)
 | Status | 单选 | ✓ | `published` / `draft` | 只有 `published` 会上线;`draft` 不进 git,不部署 |
 | Related Slugs | 多行文本 |   | `ai-agents-2025-q4, robotics-next-decade-2025-q3` | 逗号分隔,填其他 deck 的 slug。详情页底部 "Related Reports" 用这个;留空会自动取最新的 2 条 |
 | Intro | 多行文本 |   | 见下方 | 详情页右栏 Reading Guide。**段落之间留一个空行**,sync 脚本会把它们拆成段落数组 |
+| Cover | 附件 |   | 拖一张图 | **只给 featured deck 用**。16:9 比例、2MB 以内推荐。其他 deck 填了也不会在站内渲染。sync 脚本会把附件下载到 repo `public/covers/<slug>.<ext>` 并 commit,Vercel 从本地静态资源加载,不依赖飞书 CDN |
 
 ### Intro 字段格式示例(关键)
 
@@ -57,6 +58,18 @@ Base 名字:**拾象官网 — Decks**(或任意名)
 ```
 
 三段文字,**段之间一个空行**。渲染到详情页就是三段 `<p>`。
+
+### Cover 字段使用指引
+
+- **只有 featured deck(`Featured = ☑` + `Status = published`)会在 `/reports` 首页左侧露出封面图**。其他 deck 填了 cover 也不会出现在站内任何位置
+- 推荐尺寸:**1600×900(16:9)**,控制在 **2MB 以内**;格式 jpg / png / webp 都可
+- `npm run sync:decks` 时脚本会:
+  1. 读 Cover 列的第一个附件
+  2. 调飞书 drive media download API 把它拉下来
+  3. 保存到 repo `public/covers/<slug>.<ext>`,扩展名按附件原 name 或 Content-Type 推断
+  4. 在生成的 `content/decks.ts` 里给该 deck 写 `cover: "/covers/<slug>.<ext>"`
+- 下载失败 / 附件为空 → 脚本 log warn 但继续同步其他字段;featured 卡片不渲染封面,退回纯文字 Sequoia 风格
+- `public/covers/*` **进 git**,由 sync 脚本维护(不要手动加图进去,下次 sync 会冲突)
 
 ---
 

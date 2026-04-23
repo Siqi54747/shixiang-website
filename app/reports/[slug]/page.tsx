@@ -5,6 +5,7 @@ import {
   getDeckBySlug,
   getPublishedDecks,
   formatMonthYear,
+  getDriveThumbnailUrl,
 } from "@/content/decks";
 import { DeckEmbed } from "@/components/DeckEmbed";
 import { ShareBar } from "@/components/ShareBar";
@@ -27,24 +28,20 @@ export function generateMetadata({ params }: Params) {
   // Ops can leave Summary empty on most decks and only fill it when a
   // bespoke meta description improves discoverability.
   const description = deck.summary ?? deck.intro?.[0] ?? deck.subtitle;
-  // OG image: if the deck has a bespoke cover (ops uploaded one in
-  // Base), use it directly — no generated template can beat a
-  // purpose-made cover. Fall back to the /api/og text template for
-  // decks without a cover. Cover images are 1600×900 (the sync
-  // pipeline's normalized size); social platforms accept that ratio
-  // and either letterbox or center-crop to their 1200×630 slot
-  // without breaking readability.
-  const ogUrl = deck.cover ?? `/api/og?slug=${encodeURIComponent(deck.slug)}`;
-  const ogDimensions = deck.cover
-    ? { width: 1600, height: 900 }
-    : { width: 1200, height: 630 };
+  // OG image: use the deck PDF's first page via Google Drive's
+  // public thumbnail endpoint. Every deck whose Drive file is
+  // "Anyone with the link" already has this image auto-generated
+  // by Google at zero cost to ops. Falls back to the /api/og text
+  // template when no Drive URL is available yet.
+  const driveThumb = getDriveThumbnailUrl(deck);
+  const ogUrl = driveThumb ?? `/api/og?slug=${encodeURIComponent(deck.slug)}`;
   return {
     title: `${deck.title} · ${copy.site.name}`,
     description,
     openGraph: {
       title: deck.title,
       description,
-      images: [{ url: ogUrl, ...ogDimensions, alt: deck.title }],
+      images: [{ url: ogUrl, alt: deck.title }],
       type: "article",
     },
     twitter: {

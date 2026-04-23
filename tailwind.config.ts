@@ -33,6 +33,19 @@ const config: Config = {
           "system-ui",
           "sans-serif",
         ],
+        // Reports-only serif — scoped to /reports pages via the
+        // `font-display-serif` class. Home/Thesis pages keep
+        // EB Garamond (font-serif). Instrument Serif reads a bit more
+        // modern & editorial than Garamond's old-book lean, closer to
+        // the Vercel/Linear/Posthog "tech-research" voice.
+        "display-serif": [
+          "'Instrument Serif'",
+          "'Noto Serif SC'",
+          "Georgia",
+          "Cambria",
+          "'Times New Roman'",
+          "serif",
+        ],
       },
       colors: {
         // Brand

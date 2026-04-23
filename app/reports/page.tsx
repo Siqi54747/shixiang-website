@@ -36,10 +36,10 @@ export default function ReportsListPage() {
                 <p className="text-[11px] tracking-label uppercase text-cream/60">
                   {featured.quarter} · {copy.reportsList.featuredEyebrow}
                 </p>
-                <h2 className="font-serif text-[44px] md:text-[56px] leading-[1.05] mt-14 md:mt-20">
+                <h2 className="font-display-serif text-[44px] md:text-[56px] leading-[1.05] mt-14 md:mt-20">
                   {featured.title}
                 </h2>
-                <p className="font-serif text-[18px] md:text-[22px] text-cream/70 mt-14 md:mt-20">
+                <p className="font-display-serif text-[18px] md:text-[22px] text-cream/70 mt-14 md:mt-20">
                   {featured.subtitle}
                 </p>
                 <span className="inline-block mt-10 md:mt-16 text-[14px] border-b border-cream pb-[4px] group-hover:border-crimson group-hover:text-crimson transition-colors">
@@ -64,7 +64,7 @@ export default function ReportsListPage() {
                     <p className="text-[11px] tracking-label uppercase text-meta">
                       {deck.quarter}
                     </p>
-                    <h3 className="font-serif text-[22px] md:text-[26px] text-ink mt-2 group-hover:text-crimson transition-colors">
+                    <h3 className="font-display-serif text-[22px] md:text-[26px] text-ink mt-2 group-hover:text-crimson transition-colors">
                       {deck.title}
                     </h3>
                     <p className="text-[14px] text-muted mt-2">{deck.subtitle}</p>
@@ -83,7 +83,7 @@ export default function ReportsListPage() {
                     <span className="mx-2 text-rule">·</span>
                     <span className="text-crimson">Coming Soon</span>
                   </p>
-                  <h3 className="font-serif text-[22px] md:text-[26px] text-ink mt-2">
+                  <h3 className="font-display-serif text-[22px] md:text-[26px] text-ink mt-2">
                     {deck.title}
                   </h3>
                   <p className="text-[14px] text-muted mt-2">{deck.subtitle}</p>

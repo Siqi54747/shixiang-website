@@ -49,7 +49,7 @@ export default function ReportDetailPage({ params }: Params) {
         {formatMonthYear(deck.publishedDate)}
       </p>
 
-      <h1 className="font-serif text-[40px] md:text-[48px] lg:text-[56px] leading-[1.1] text-ink mt-2">
+      <h1 className="font-display-serif text-[40px] md:text-[48px] lg:text-[56px] leading-[1.1] text-ink mt-2">
         {deck.title}
       </h1>
 

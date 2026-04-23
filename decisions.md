@@ -318,3 +318,34 @@ DocSend embed 依赖第三方 cookie 追踪访客 + 校验 email gate。2026 年
 - 站点的其他所有设计、结构、路由、组件均不变
 - 未来如果要支持多种 embed 源（Google Drive + DocSend + 自建）同时存在，只需扩展 `<DeckEmbed>` 的 URL 识别逻辑
 
+---
+
+## 2026-04-23: 首页 Thesis 入口改为外链，站内详情页废弃
+
+### 决策
+
+首页 Thesis terminal-window 的 4 条 entry 直接链到**海外独角兽公众号原文**（新 tab 打开），不再走站内 `/thesis/<slug>` 详情页。该路由删除，返回 404。
+
+### 原因
+
+站内 Sequoia 极简详情页从 2026-04-20 起一直在和 WeChat 导出 markdown 的系统性 quirk 搏斗：cover link / 装饰 banner / `****` 粘连 / `**NN.**`-heading 双段结构 / 💡 目录 / broken img 留边线 / 子章节层级扁平……本轮 session 又补了 6 条 preprocess + 3 条 postprocess 规则（commits `a517037` → `607149e`）之后仍有开放 polish（TOC、figure caption、prose-img border、子章节分层）。
+
+权衡之后判断：**上线窗口期，最低成本的正确渲染就是公众号原页本身**。公众号原文排版已经是作者确认过的版本，拾象官网没有必要在镜像这份内容上再投入工程。
+
+### 影响
+
+- **删除**：`app/thesis/[slug]/page.tsx`
+- **保留**：
+  - `lib/markdown.ts`（6+3 条规则，commit `a517037` → `607149e`）
+  - `content/theses/*.md` × 4
+  - `components/ThesisWindow.tsx` 和 `content/copy.ts` 的 entries（仅把跳转目标从 `/thesis/<slug>` 换成 frontmatter 里的公众号 `url`）
+- **视觉**：箭头 glyph `→` → `↗`，表示离站跳转
+- **SEO**：拾象域名下暂无 thesis 长文内容，对搜索可见度有取舍。如果未来 SEO 变成优先级，见 `polish-todo.md` P2 "Revive in-site thesis detail page"
+
+### 复活路径（未来需要时）
+
+- 代码起点：commit `29ba8f1^` 可还原 `app/thesis/[slug]/page.tsx`
+- 规则起点:`lib/markdown.ts` 已经 settle 的 6 条 preprocess + 3 条 postprocess
+- 未完成的 polish 见 `polish-todo.md` P2 对应条目（侧栏 TOC / 子章节层级 / prose-img border / figure caption）
+- 触发条件见同文件 P2
+

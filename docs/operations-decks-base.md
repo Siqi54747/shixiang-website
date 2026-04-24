@@ -108,25 +108,25 @@ Base 名字:**拾象官网 — Decks**(或任意名)
 
 ### 首次配置(做一次)
 
-Sync 脚本直接借用本机 `lark-cli` 已登录的 **user 身份**(目前是 Siqi),不再走自建应用 + tenant token 那套。只需要告诉脚本"去拉哪张 Base 的哪张表"。
+Sync 脚本直接调飞书 OpenAPI,用自建应用 `Shixiang-website-publish` 的 `tenant_access_token` 鉴权。需要四个 env vars。
 
-1. 确保 lark-cli 登录过并带 `base` 域:
-   ```bash
-   lark-cli auth login --domain base
-   ```
-   一次授权长期有效,token 会自动 refresh。
-2. 项目本地:
+1. 飞书开放平台 → `Shixiang-website-publish` 应用 → **凭证与基础信息**,记下 **App ID** + **App Secret**
+2. 应用必须满足:
+   - 已开通 `bitable:app:readonly` scope(records 读)
+   - 已加入 Decks Base 的协作人(权限 ≥ 可阅读)
+   - (后续)`drive:drive:readonly` scope 过审后,Cover 附件下载也能自动完成;暂未开通时,sync 会保留本地已有 cover 文件,新加的 cover 会 warn 提示运营手动放
+3. 项目本地:
    ```bash
    cp .env.local.example .env.local
-   # 填 LARK_BASE_APP_TOKEN / LARK_BASE_TABLE_ID
+   # 填 LARK_APP_ID / LARK_APP_SECRET / LARK_BASE_APP_TOKEN / LARK_BASE_TABLE_ID
    ```
-3. 两个值从 Base URL 提取:
+4. 后两个值从 Base URL 提取:
    ```
    https://<租户>.feishu.cn/base/<APP_TOKEN>?table=<TABLE_ID>&view=...
                                 ^^^^^^^^^^^          ^^^^^^^^^^^
    ```
 
-> ℹ️ 为什么不走 tenant token(bot 身份):`cli_*` 开头的 lark-cli 内建应用不能作为"文档应用"加进 Base 的协作人列表 —— 飞书文档应用只接受在开放平台正式创建并发布的业务应用。我们不需要这层抽象,sync 永远是本地手动跑,piggyback user 身份更简单。
+> ℹ️ 历史:2026-04-23 首版 sync 用的是 lark-cli user 身份(piggyback Siqi 的本地登录态),好处是零应用申请。2026-04-24 切到 self-built app + tenant token,目的是解除"必须在 Siqi 本机才能跑"的绑定 —— CI / GitHub Actions 也能直接跑 sync,为后续"Base 按钮触发自动发布"打开通路。
 
 ### 每次运营改完后 —— 一键命令
 
@@ -161,12 +161,14 @@ git push
 
 | 报错 | 原因 | 处理 |
 |---|---|---|
-| `Missing env vars` | `.env.local` 没配 / 变量名拼错 | 对照 `.env.local.example` |
-| `lark-cli ... failed ... auth ...` | lark-cli 没登录 / token 过期 | `lark-cli auth login --domain base` |
-| `record-list failed ... permission` | 当前 lark-cli 登录用户不是 Base 协作人 | Base 把该用户加为"可阅读"以上 |
+| `Missing env vars` | `.env.local` 没配 / 变量名拼错 | 对照 `.env.local.example`(4 个变量) |
+| `tenant_access_token request failed` | App ID / Secret 错 | 飞书开放平台 → 凭证与基础信息,核对两个值 |
+| `... failed (http=403, code=91403)` | 应用不是 Base 协作人,或 scope 未生效 | Base → 分享 → 添加协作者 → 搜应用名加为"可阅读";若是 scope 问题等管理员审 |
+| `... failed (http=400, code=99991663)` | 应用版本未发布 / 已下架 | 飞书开放平台 → 版本管理与发布 → 提交审核 |
 | `Duplicate slug: xxx` | Base 里两条记录 Slug 相同 | Base 里改一条 |
 | `Multiple featured+published decks` | Base 里多条勾了 Featured+published | Base 里只留一条勾 Featured |
 | `Deck 'xxx' missing required fields` | 某必填字段为空 | Base 里把该行补全 |
+| `cover attachment present in Base ... but no local file` | Cover 字段有附件,但本地 `public/covers/` 没对应文件 | drive scope 过审前手动把图存到 `public/covers/<slug>.<ext>` |
 
 ---
 

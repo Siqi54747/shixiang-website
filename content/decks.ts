@@ -79,7 +79,12 @@ export const decks: Deck[] = [
     status: "published",
     intro: [
       "过去一个季度,AI 的竞争从“谁的模型更强”切换到“谁的打法更对”，头部几家像 F1 竞赛,方向选错一次就可能掉队,而 Agent 在局部已经跑出 L4 级别的体验：",
-      "1. 模型在分化,没人稳赢、更没有躺赢,今天的 SOTA 在 3-6 个月后就是市场平均水平,头部几家像 F1 竞赛,犯错很容易直接掉队；\n2. AI Labs 走出两条路:横向全家桶(ChatGPT = AI 时代的 MS Office 套件)与纵向 Full Stack 整合(Google 的 TPU + Gemini + 存量场景),基础模型公司都要端到端做好 Agent,纯 API 生意壁垒不够;\n3. Agent 领域已经实现 L4 级别体验,ChatGPT Deep Research 和 Claude Code 是两个代表;Coding Agent 模式跑通之后,会持续向其他 AI Workspace 领域拓展;\n4. Anthropic all-in coding 是对 Cursor 最大的不利,Coding 能力是 FM 能力的子集,Cursor 想向下改数据分布,模型训练能力完全跟不上,最终会反映到用户体验上;\n5. Google 被严重低估,ChatGPT 和 Google 最终会殊途同归,Google AIO 在 AI Ads 上的探索比 Perplexity / ChatGPT 走得更深,Gemini 的后劲可能才是最强的;\n6. 做 AI 产品很像\"挖矿\",且有明确的时间保鲜窗口:第一个做出让用户惊叹的 Magic Moment,等于拿到 5 亿美金的免费营销;AI 创业范式正在变,每一次科技浪潮都会诞生新的 Native 基金,30 倍 DPI 的机会留给围绕主线找非共识的人。",
+      "1. 模型在分化,没人稳赢、更没有躺赢,今天的 SOTA 在 3-6 个月后就是市场平均水平,头部几家像 F1 竞赛,犯错很容易直接掉队；",
+      "2. AI Labs 走出两条路:横向全家桶(ChatGPT = AI 时代的 MS Office 套件)与纵向 Full Stack 整合(Google 的 TPU + Gemini + 存量场景),基础模型公司都要端到端做好 Agent,纯 API 生意壁垒不够;",
+      "3. Agent 领域已经实现 L4 级别体验,ChatGPT Deep Research 和 Claude Code 是两个代表;Coding Agent 模式跑通之后,会持续向其他 AI Workspace 领域拓展;",
+      "4. Anthropic all-in coding 是对 Cursor 最大的不利,Coding 能力是 FM 能力的子集,Cursor 想向下改数据分布,模型训练能力完全跟不上,最终会反映到用户体验上;",
+      "5. Google 被严重低估,ChatGPT 和 Google 最终会殊途同归,Google AIO 在 AI Ads 上的探索比 Perplexity / ChatGPT 走得更深,Gemini 的后劲可能才是最强的;",
+      "6. 做 AI 产品很像\"挖矿\",且有明确的时间保鲜窗口:第一个做出让用户惊叹的 Magic Moment,等于拿到 5 亿美金的免费营销;AI 创业范式正在变,每一次科技浪潮都会诞生新的 Native 基金,30 倍 DPI 的机会留给围绕主线找非共识的人。",
     ],
     summary: "Agent 在局部已经跑出 L4 级别的体验",
   },

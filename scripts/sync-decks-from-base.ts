@@ -282,11 +282,32 @@ function readCommaList(v: unknown): string[] {
 function readParagraphs(v: unknown): string[] | undefined {
   const s = readText(v);
   if (!s.trim()) return undefined;
-  const paras = s
+  const blankSplit = s
     .split(/\n\s*\n+/)
     .map((p) => p.trim())
     .filter(Boolean);
-  return paras.length > 0 ? paras : undefined;
+
+  // Heuristic: operations sometimes type a numbered list separating
+  // items with single newlines instead of blank lines, which would
+  // collapse into one big <p>. If a paragraph contains \n-separated
+  // lines AND at least 2 of those lines start with a list marker
+  // (`1.` / `2.` / `•` / `-`), treat each line as its own paragraph.
+  // Plain prose with soft line breaks is left untouched.
+  const out: string[] = [];
+  for (const para of blankSplit) {
+    if (!para.includes("\n")) {
+      out.push(para);
+      continue;
+    }
+    const lines = para.split(/\n/).map((l) => l.trim()).filter(Boolean);
+    const listMarkerCount = lines.filter((l) => /^(\d+\.\s|[•·▪]\s|-\s)/.test(l)).length;
+    if (lines.length >= 2 && listMarkerCount >= 2) {
+      out.push(...lines);
+    } else {
+      out.push(para);
+    }
+  }
+  return out.length > 0 ? out : undefined;
 }
 
 interface AttachmentRef {

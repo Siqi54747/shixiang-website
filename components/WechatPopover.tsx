@@ -44,7 +44,7 @@ export function WechatPopover() {
   }, [open]);
 
   return (
-    <div className="relative inline-block">
+    <div className="relative inline-block w-fit self-start">
       <button
         ref={triggerRef}
         type="button"
@@ -65,7 +65,7 @@ export function WechatPopover() {
           ref={popoverRef}
           role="dialog"
           aria-label={copy.wechatModal.title}
-          className="absolute right-0 bottom-[calc(100%+12px)] z-20 bg-white border border-rule rounded-lg p-4 shadow-[0_8px_24px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.06)] min-w-[212px] text-center"
+          className="absolute left-0 bottom-[calc(100%+12px)] z-20 bg-white border border-rule rounded-lg p-4 shadow-[0_8px_24px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.06)] min-w-[212px] text-center"
         >
           <div className="mx-auto w-[180px] h-[180px] relative">
             <Image
@@ -82,11 +82,11 @@ export function WechatPopover() {
           {/* Triangle pointer */}
           <span
             aria-hidden="true"
-            className="absolute top-full right-5 w-0 h-0 border-[6px] border-transparent border-t-white -mt-px"
+            className="absolute top-full left-5 w-0 h-0 border-[6px] border-transparent border-t-white -mt-px"
           />
           <span
             aria-hidden="true"
-            className="absolute top-full right-5 w-0 h-0 border-[6px] border-transparent border-t-rule -z-10"
+            className="absolute top-full left-5 w-0 h-0 border-[6px] border-transparent border-t-rule -z-10"
           />
         </div>
       )}

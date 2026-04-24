@@ -10,9 +10,13 @@
 
 ## P0 — 上线阻塞(必做才能正式对外)
 
-### [ ] 绑定 `shixiang.tech` 域名
-- **状态**:待办
-- **落地**:Vercel project `siqi54747's projects / shixiang-website` → Settings → Domains → Add `shixiang.tech` + `www`。DNS 侧配好 A 记录或 CNAME。
+### [ ] 绑定 `shixiangcap.com` 域名 + 解决国内访问(Cloudflare 方案)
+- **状态**:Vercel Domain 已加 `cname-china.vercel-dns.com` 解析,国内直连可达但 VPN 不通(Vercel WAF 屏蔽了 VPN 出口 IP)。需切换到 Cloudflare 代理回源方案,让境内外都走 Cloudflare。
+- **落地**:
+  1. Vercel project → Settings → Domains → Add `shixiangcap.com` + `www.shixiangcap.com`
+  2. Cloudflare 添加 `shixiangcap.com` 为站点,nameserver 切到 Cloudflare
+  3. 在 Cloudflare 配 CNAME:`@` 和 `www` → Vercel 分配的目标(或仍用 `cname-china.vercel-dns.com`),橙色云开启代理
+  4. Vercel 按提示在 domain settings 里完成 HTTPS 验证
 - **当前占位**:https://shixiang-website-ten.vercel.app
 
 ### [ ] 补齐其他 3 条 deck 的 Google Drive URL + intro 段落
@@ -59,7 +63,7 @@
 - **状态**:2026-04-23 决策临时废弃,代码保留
 - **什么时候考虑复活**:
   - 公众号原文被墙/删/改链 → 我们需要自留一份
-  - 拾象要做 SEO,需要 shixiang.tech 域名下的长文内容页
+  - 拾象要做 SEO,需要 shixiangcap.com 域名下的长文内容页
   - 要加拾象特有的 UX(评论 / 相关 thesis 推荐 / 阅读进度 / 翻译切换)
   - 运营需要把 thesis 和内部 deck 交叉引用
 - **复活起点**(不要从零开始):

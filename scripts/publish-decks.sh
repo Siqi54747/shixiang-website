@@ -2,7 +2,7 @@
 #
 # One-shot: pull the latest decks from Base, review the diff, commit,
 # push. Run this after making any Base edit you want reflected on
-# shixiang.tech.
+# shixiangcap.com.
 #
 #   npm run publish:decks
 #

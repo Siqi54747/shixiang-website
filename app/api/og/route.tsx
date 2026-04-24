@@ -15,7 +15,7 @@
  *   - Crimson (#A11F2A) vertical accent bar + quarter tag, same
  *     motif used in the Reading Guide container on detail pages.
  *   - Red elephant logo (logo-horizontal-brand.png) top-left.
- *   - shixiang.tech as a bottom-right signature.
+ *   - shixiangcap.com as a bottom-right signature.
  *   - Font stack relies on Satori's built-in Noto Sans fallback for
  *     both Latin and CJK; we haven't shipped a custom font yet.
  *     Adding Instrument Serif later is a localized change (ship the
@@ -159,7 +159,7 @@ export async function GET(req: Request) {
             letterSpacing: "1px",
           }}
         >
-          shixiang.tech
+          shixiangcap.com
         </div>
       </div>
     ),

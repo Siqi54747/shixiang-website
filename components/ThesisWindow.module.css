@@ -32,7 +32,7 @@
     0 4px 16px rgba(0, 0, 0, 0.04);
   --hover-border: rgba(0, 0, 0, 0.06);
 
-  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, 'SFMono-Regular',
+  --font-mono: var(--font-jetbrains-mono), 'Fira Code', ui-monospace, 'SFMono-Regular',
                Menlo, Monaco, Consolas, monospace;
 
   max-width: 1060px;
@@ -106,15 +106,29 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 8px;
 }
 
+/* Hover/focus highlight lives on the .entry (the grid container) so
+   the band spans both the line-number column and the content column.
+   Previously the highlight was on .link, which left the line number
+   sitting outside the band — and on small viewports the negative
+   margin used to extend that band ended up overlapping the line
+   number column, visually squeezing "04" etc. */
 .entry {
   display: grid;
   grid-template-columns: 40px 1fr;
   gap: 28px;
   align-items: start;
   position: relative;
+  padding: 12px 16px;
+  margin: 0 -16px;
+  border-radius: 4px;
+  border-left: 2px solid transparent;
+  transition: background 0.2s ease,
+              border-color 0.2s ease,
+              box-shadow 0.2s ease,
+              transform 0.2s ease;
 }
 
 .lineNumber {
@@ -122,7 +136,6 @@
   font-weight: 500;
   color: var(--color-text-muted);
   text-align: right;
-  padding-top: 8px;
   transition: color 0.15s ease;
 }
 
@@ -130,18 +143,7 @@
   display: block;
   text-decoration: none;
   color: inherit;
-  /* Rendered as <div> (disabled until per-thesis detail pages exist),
-     but must still look clickable on hover, so keep the pointer cursor
-     that <a> would have given us by default. */
   cursor: pointer;
-  padding: 12px 16px;
-  margin: -12px -16px;
-  border-radius: 4px;
-  border-left: 2px solid transparent;
-  transition: background 0.2s ease,
-              border-color 0.2s ease,
-              box-shadow 0.2s ease,
-              transform 0.2s ease;
 }
 
 .primary {
@@ -186,8 +188,8 @@
 }
 
 /* ---------- Hover state ---------- */
-.entry:hover .link,
-.entry:focus-within .link {
+.entry:hover,
+.entry:focus-within {
   background: var(--bg-hover-row);
   border-left-color: var(--color-brand-red);
   box-shadow: var(--hover-shadow);
@@ -288,7 +290,7 @@
 
   .arrow { opacity: 0.5; transform: none; }
 
-  .entry:active .link {
+  .entry:active {
     background: var(--bg-hover-row);
     box-shadow: var(--hover-shadow);
   }
@@ -300,7 +302,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .link,
+  .entry,
   .lineNumber,
   .tag,
   .desc,
@@ -308,8 +310,8 @@
   .arrow {
     transition: none;
   }
-  .entry:hover .link,
-  .entry:focus-within .link {
+  .entry:hover,
+  .entry:focus-within {
     transform: none;
   }
 }

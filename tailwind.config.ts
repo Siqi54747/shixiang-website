@@ -10,8 +10,8 @@ const config: Config = {
     extend: {
       fontFamily: {
         sans: [
-          "Inter",
-          "'Noto Sans SC'",
+          "var(--font-inter)",
+          "var(--font-noto-sans-sc)",
           "system-ui",
           "-apple-system",
           "'PingFang SC'",
@@ -20,18 +20,26 @@ const config: Config = {
           "sans-serif",
         ],
         serif: [
-          "'EB Garamond'",
-          "'Noto Serif SC'",
+          "var(--font-eb-garamond)",
+          "var(--font-noto-serif-sc)",
           "Georgia",
           "Cambria",
           "'Times New Roman'",
           "serif",
         ],
         display: [
-          "'Epunda Sans'",
-          "Inter",
+          "var(--font-inter)",
           "system-ui",
           "sans-serif",
+        ],
+        mono: [
+          "var(--font-jetbrains-mono)",
+          "ui-monospace",
+          "SFMono-Regular",
+          "Menlo",
+          "Monaco",
+          "Consolas",
+          "monospace",
         ],
       },
       colors: {

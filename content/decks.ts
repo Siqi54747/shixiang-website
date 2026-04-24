@@ -5,6 +5,7 @@ export interface Deck {
   quarter: string;      // e.g. "2026 Q1"
   publishedDate: string; // ISO "YYYY-MM-DD"
   embedUrl: string;     // iframe-able preview URL (sync 脚本会归一成 Google Drive /preview 格式); 空字符串 = 未填
+  embedUrlCn?: string;  // 国内访问备用 iframe URL (飞书/腾讯文档公开分享嵌入)。留空时国内用户回退到 embedUrl(可能因 DocSend/Drive 被墙白屏)。
   featured: boolean;
   status: "draft" | "published";
   relatedSlugs?: string[];
@@ -158,6 +159,21 @@ export function getDriveThumbnailUrl(deck: Deck, sizePx = 1600): string | undefi
   const m = deck.embedUrl.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
   if (!m) return undefined;
   return `https://drive.google.com/thumbnail?id=${m[1]}&sz=w${sizePx}`;
+}
+
+/**
+ * Pick the iframe src best suited to the current reader. CN users
+ * should prefer embedUrlCn (飞书/腾讯文档) because Google Drive and
+ * DocSend are blocked by the GFW. Overseas readers keep the canonical
+ * Drive preview.
+ *
+ * `preferCn` is a client-side boolean derived from signals like
+ * `navigator.language === "zh-CN"` or a geo cookie. The function
+ * gracefully falls back when only one url is filled.
+ */
+export function pickEmbedUrl(deck: Deck, preferCn: boolean): string {
+  if (preferCn && deck.embedUrlCn) return deck.embedUrlCn;
+  return deck.embedUrl || deck.embedUrlCn || "";
 }
 
 export function getRelatedDecks(deck: Deck, limit = 2): Deck[] {

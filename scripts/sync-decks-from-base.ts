@@ -235,11 +235,24 @@ function readSingleSelect(v: unknown): string {
 }
 
 function readUrl(v: unknown): string {
-  // Bitable URL column comes back as { text, link } via the
-  // OpenAPI; readText extracts `text` (= the URL the operator
-  // pasted). We also keep a tolerance for "[url](url)" markdown
-  // wrapping, in case anyone hand-edits the column type to
-  // multi-line text.
+  // Bitable URL column comes back as { text, link } via the OpenAPI.
+  // `text` is the display label (Feishu auto-fills it with the filename
+  // when the operator pastes a 飞书云空间/腾讯文档 share link), `link`
+  // is the real URL. We MUST prefer `link`; reading `text` returns
+  // garbage like "xxx.pdf" (the 2026-04-24 sync bug). Fallback chain:
+  //   1. object `{text, link}` or array of same: use `link`
+  //   2. plain string "[label](url)": extract url
+  //   3. plain string: return as-is
+  if (v && typeof v === "object") {
+    if (Array.isArray(v) && v.length > 0) {
+      const first = v[0];
+      if (first && typeof first === "object" && "link" in first) {
+        return String((first as { link: unknown }).link ?? "").trim();
+      }
+    } else if ("link" in v) {
+      return String((v as { link: unknown }).link ?? "").trim();
+    }
+  }
   const s = readText(v).trim();
   const m = s.match(/^\[(.+?)\]\((.+?)\)$/);
   return m ? (m[2] || m[1]) : s;
@@ -372,6 +385,7 @@ interface Deck {
   quarter: string;
   publishedDate: string;
   embedUrl: string;
+  embedUrlCn?: string;
   featured: boolean;
   status: "draft" | "published";
   relatedSlugs?: string[];
@@ -389,6 +403,7 @@ const COL = {
   quarter: "Quarter",
   publishedDate: "Published Date",
   embedUrl: "Embed URL",
+  embedUrlCn: "Embed URL (CN)",
   featured: "Featured",
   status: "Status",
   relatedSlugs: "Related Slugs",
@@ -402,6 +417,7 @@ function recordToDeck(record: BaseRecord): Deck {
   const status = readSingleSelect(f[COL.status]).toLowerCase();
   const relatedSlugs = readCommaList(f[COL.relatedSlugs]);
   const summary = readText(f[COL.summary]).trim();
+  const embedUrlCn = readUrl(f[COL.embedUrlCn]).trim();
 
   return {
     slug: readText(f[COL.slug]).trim(),
@@ -410,6 +426,11 @@ function recordToDeck(record: BaseRecord): Deck {
     quarter: readText(f[COL.quarter]).trim(),
     publishedDate: readIsoDate(f[COL.publishedDate]),
     embedUrl: normalizeDriveUrl(readUrl(f[COL.embedUrl])),
+    // CN embed URL is pass-through (no Drive normalization) — 飞书/腾讯
+    // 文档 each have their own iframe share formats the operator pastes
+    // directly. Empty string is elided to keep the serialized snapshot
+    // tidy; runtime picker falls back to embedUrl.
+    ...(embedUrlCn ? { embedUrlCn } : {}),
     featured: readCheckbox(f[COL.featured]),
     status: status === "draft" ? "draft" : "published",
     ...(relatedSlugs.length > 0 ? { relatedSlugs } : {}),
@@ -457,6 +478,7 @@ function serialize(decks: Deck[]): string {
     lines.push(`    quarter: ${q(d.quarter)},`);
     lines.push(`    publishedDate: ${q(d.publishedDate)},`);
     lines.push(`    embedUrl: ${q(d.embedUrl)},`);
+    if (d.embedUrlCn) lines.push(`    embedUrlCn: ${q(d.embedUrlCn)},`);
     lines.push(`    featured: ${d.featured},`);
     lines.push(`    status: ${q(d.status)},`);
     if (d.relatedSlugs && d.relatedSlugs.length > 0) {

@@ -80,7 +80,7 @@ export default function ReportDetailPage({ params }: Params) {
         {/* Left column: iframe + share bar centered beneath it.
             2/3 of the split via col-span-2. */}
         <div className="lg:col-span-2 flex flex-col items-center gap-[14px]">
-          <DeckEmbed url={deck.embedUrl} title={deck.title} />
+          <DeckEmbed url={deck.embedUrl} urlCn={deck.embedUrlCn} title={deck.title} />
           <ShareBar title={deck.title} />
         </div>
 

@@ -37,7 +37,8 @@ Base 名字:**拾象官网 — Decks**(或任意名)
 | Subtitle (CN) | 单行文本 | ✓ | `全球 AGI 赛道全景梳理` | 中文副标题 |
 | Quarter | 单行文本 | ✓ | `2026 Q1` | 年份 + 季度,用于标签展示 |
 | Published Date | 日期 | ✓ | `2026-04-01` | 发布日期,列表排序按这个字段倒序 |
-| Embed URL | 超链接(或文本) |   | `https://drive.google.com/file/d/XXXX/preview` | Google Drive 分享链接随便哪种格式都行(`/view` / `/view?usp=sharing` / `/preview` / `open?id=`),sync 脚本会自动归一成 `/preview`。留空 = 列表页显示 "Coming Soon",不可点 |
+| Embed URL | 超链接(或文本) |   | `https://drive.google.com/file/d/XXXX/preview` | Google Drive 分享链接随便哪种格式都行(`/view` / `/view?usp=sharing` / `/preview` / `open?id=`),sync 脚本会自动归一成 `/preview`。**海外读者看这条**。留空 = 列表页显示 "Coming Soon",不可点 |
+| Embed URL (CN) | 超链接(或文本) |   | `https://xxx.feishu.cn/docx/shrcn...` / `https://docs.qq.com/pdf/xxxxx` | **国内读者看这条**。Google Drive / DocSend 在大陆被墙,需要上传一份飞书文档或腾讯文档的公开嵌入链接作为镜像。留空时国内用户回退到 Embed URL(会白屏)。上传后记得把分享权限设为"任何人可查看",且开启"允许嵌入"(飞书文档 → 设置 → 分享;腾讯文档 → 分享 → 嵌入到网页) |
 | Summary | 单行文本 |   | `全球 AGI 赛道全景梳理,覆盖 OpenAI / Anthropic / Google DeepMind 三家动向。` | **可选**。只为 SEO 想写一段 ≤150 字符的专门描述时才填。留空时网站回退到 Intro 第一段,再回退到 Subtitle。不在页面正文里显示,只出现在 Google / 微信分享卡的描述位 |
 | Featured | 复选框 | ✓ | ☑ | 同一时刻**只能有一条** featured + published 的 deck。勾选的那条会在首页露出 |
 | Status | 单选 | ✓ | `published` / `draft` | 只有 `published` 会上线;`draft` 不进 git,不部署 |
@@ -80,7 +81,8 @@ Base 名字:**拾象官网 — Decks**(或任意名)
 1. Base 里点"新增记录",把上表必填字段都填了
 2. Embed URL 暂时没有?留空,`Status` 设 `draft`,页面上不会出现
 3. 拿到 Google Drive URL 后,回来填 Embed URL,把 Status 改 `published`
-4. 通知开发 / 自己跑 `npm run sync:decks`
+4. **(强烈建议)同步一份飞书/腾讯文档,填到 Embed URL (CN)**,否则国内读者打不开
+5. 通知开发 / 自己跑 `npm run sync:decks`
 
 ### 2. 改 Reading Guide 文案
 

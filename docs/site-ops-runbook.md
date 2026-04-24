@@ -6,7 +6,7 @@
 > **两个镜像,一份真源**:
 > - **Source of truth**:本仓库 `docs/site-ops-runbook.md`(GitHub,版本可追溯)
 > - **飞书镜像**(非 dev 团队看):https://www.feishu.cn/docx/WBbqdHarwoctilxbjqzcYm4WnXc
-> - **同步方式**:改 GitHub → `tail -n +3 docs/site-ops-runbook.md > /tmp/body.md` → `lark-cli docs +update --doc-id WBbqdHarwoctilxbjqzcYm4WnXc --mode replace --markdown "$(cat /tmp/body.md)"`
+> - **同步方式**:改 GitHub → `tail -n +3 docs/site-ops-runbook.md > /tmp/body.md` → `lark-cli docs +update --doc WBbqdHarwoctilxbjqzcYm4WnXc --mode overwrite --markdown "$(cat /tmp/body.md)"`
 >
 > **不在这份**里的内容:
 > - 品牌/内容策略 → 看 `prd.md`

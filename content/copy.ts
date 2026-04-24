@@ -82,6 +82,7 @@ export const copy = {
     shareCopied: "已复制",
     shareWechatToast: "已复制链接，粘贴到微信即可分享",
     embedPlaceholder: "Deck preview (coming soon)",
+    cnOpenCta: "在飞书中打开 PDF →",
   },
   wechatModal: {
     label: "WECHAT",

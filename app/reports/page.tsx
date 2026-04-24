@@ -16,33 +16,35 @@ export default function ReportsListPage() {
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,480px)_minmax(0,1fr)] gap-8 lg:gap-12">
         {/* Featured (left) */}
         {featured && (
-          <div className="lg:sticky lg:top-[74px] self-start">
+          <div className="lg:sticky lg:top-[74px] lg:h-[calc(100vh-74px-40px)]">
             <Link
               href={`/reports/${featured.slug}`}
-              className="block bg-obsidian text-cream rounded-sm overflow-hidden group"
+              className="relative block bg-obsidian text-cream rounded-sm overflow-hidden group aspect-[16/9] lg:aspect-auto lg:h-full"
             >
               {featured.cover && (
-                // Optional cover image; flush to the card edges above the
-                // content padding. 16:9 matches the Google Drive preview
-                // aspect the detail page iframe will render.
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={featured.cover}
-                  alt={featured.title}
-                  className="block w-full aspect-[16/9] object-cover"
+                  alt=""
+                  aria-hidden="true"
+                  className="absolute inset-0 w-full h-full object-cover"
                 />
               )}
-              <div className="px-10 md:px-12 py-10 md:py-12">
-                <p className="text-[11px] tracking-label uppercase text-cream/60">
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 bg-gradient-to-t from-obsidian via-obsidian/70 to-obsidian/10"
+              />
+              <div className="relative h-full flex flex-col justify-end px-8 md:px-10 py-8 md:py-10">
+                <p className="text-[11px] tracking-label uppercase text-cream/70">
                   {featured.quarter} · {copy.reportsList.featuredEyebrow}
                 </p>
-                <h2 className="font-serif text-[44px] md:text-[56px] leading-[1.05] mt-14 md:mt-20">
+                <h2 className="font-serif text-[32px] md:text-[44px] leading-[1.05] mt-3 md:mt-4">
                   {featured.title}
                 </h2>
-                <p className="font-serif text-[18px] md:text-[22px] text-cream/70 mt-14 md:mt-20">
+                <p className="font-serif text-[16px] md:text-[20px] text-cream/80 mt-3 md:mt-4">
                   {featured.subtitle}
                 </p>
-                <span className="inline-block mt-10 md:mt-16 text-[14px] border-b border-cream pb-[4px] group-hover:border-crimson group-hover:text-crimson transition-colors">
+                <span className="inline-block self-start mt-5 md:mt-6 text-[14px] border-b border-cream pb-[4px] group-hover:border-crimson group-hover:text-crimson transition-colors">
                   {copy.reportsList.featuredCta}
                 </span>
               </div>

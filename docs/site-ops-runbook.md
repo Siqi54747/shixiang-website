@@ -3,6 +3,11 @@
 > **这份文档是什么**:shixiangcap.com 的**凭证、待办、应急联系人**总索引。
 > 团队里任何人(开发/运营/IT)想接手或排查问题,先看这一份。
 >
+> **两个镜像,一份真源**:
+> - **Source of truth**:本仓库 `docs/site-ops-runbook.md`(GitHub,版本可追溯)
+> - **飞书镜像**(非 dev 团队看):https://www.feishu.cn/docx/WBbqdHarwoctilxbjqzcYm4WnXc
+> - **同步方式**:改 GitHub → `tail -n +3 docs/site-ops-runbook.md > /tmp/body.md` → `lark-cli docs +update --doc-id WBbqdHarwoctilxbjqzcYm4WnXc --mode replace --markdown "$(cat /tmp/body.md)"`
+>
 > **不在这份**里的内容:
 > - 品牌/内容策略 → 看 `prd.md`
 > - 架构决策历史 → 看 `decisions.md`
@@ -36,6 +41,7 @@
 - [ ] (可选)Cloudflare 配 `cf-ipcountry` cookie Transform Rule,让 geo 检测更准
 - [ ] 浏览几次网站后 Vercel Analytics 看有数据进入
 - [ ] 把 `shixiangcap.com` 更新到拾象对外物料(微信菜单 / 名片 / LP 材料 / email 签名 / 微博 bio)
+- [ ] **迭代 PDF 托管方案**:实测飞书 `larksuite.com` 海外加载速度,若 OK 则考虑砍掉 Google Drive(见下方"PDF 托管方案对比")
 
 ### Phase 3:本月内治理改进(重要)
 
@@ -137,6 +143,27 @@
 5. 记录更新到这份 runbook 的凭证清单
 
 **估时**:2-3 小时(主要是等邀请接受 + 等验证邮件)。**重要性**:高。**紧迫性**:中(网站上线后再做也不晚,但不要超过一个月)。
+
+---
+
+## PDF 托管方案对比(待迭代,Phase 2)
+
+> 现状是 Drive(海外 canonical)+ 飞书(国内 fallback)双轨。双轨意味着每份 report 运营要传两份、维护两个链接。如果能统一到单一托管方,CMS 和运营体验都会显著简化。下表是候选方案的对比,**任何切换前必须先挑 1 份 deck 实测(开 VPN + 不开 VPN)再决定**。
+
+| 方案 | 海外访问 | 国内(不开 VPN)| 国内(开 VPN)| 登录墙 | iframe 体验 | 账号治理 |
+|---|---|---|---|---|---|---|
+| **Google Drive(现状)** | ✅ 快 | ❌ 被墙 | ⚠️ 部分 VPN 出口被 Drive 限流 | 无 | 干净,`/preview` 专为嵌入设计 | ⚠️ owner 账号待确认 |
+| **飞书 `larksuite.com`** | 🟡 待实测(理论上海外节点 OK) | ❌ 海外域名国内慢 | ✅ | 匿名可访问(需设"互联网获得链接的人可查看") | 较干净,有飞书顶栏 | ✅ 已在拾象飞书租户内 |
+| **飞书 `feishu.cn`** | ❌ 海外路由到国内节点,慢/超时 | ✅ 快 | ✅ | 同上 | 同上 | ✅ |
+| **腾讯文档 `docs.qq.com`** | 🟡 未被墙但 CDN 在国内,海外慢 | ✅ 快 | ✅ | ⚠️ **经常弹微信/QQ 登录墙**,海外读者基本被卡住 | 参差 | 需新建账号 |
+
+**优先级**:飞书 larksuite.com 实测 > 继续维持 Drive 双轨 > 腾讯文档。
+
+**实测最小步骤**(任一方案都适用):
+1. 挑一份已发布的 deck,在飞书/腾讯文档上传一份,设为公开可查看
+2. 拿到嵌入 URL,在本地 dev 环境把 `content/decks.ts` 里这份的 URL 换掉
+3. 打开 `/reports/<slug>`,**关 VPN 测一次,开 VPN 测一次**,记录加载时间和是否有登录墙
+4. 若海外体验 ≥ Drive 现状,可以把这个方案推广,砍掉 Drive(Phase 3 "确认 Drive owner" 待办也一并消除)
 
 ---
 

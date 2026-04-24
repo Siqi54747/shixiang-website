@@ -33,7 +33,7 @@ export const decks: Deck[] = [
   {
     slug: "the-new-agi-landscape-2026-q1",
     title: "The New AGI Landscape",
-    subtitle: "全球 AGI 赛道全景梳理",
+    subtitle: "2026 全球 AGI 赛道全景梳理",
     quarter: "2026 Q1",
     publishedDate: "2026-04-01",
     embedUrl: "https://drive.google.com/file/d/1M98axRY6TyJQhYE0Z3O102N938yMgtUP/preview",
@@ -45,7 +45,7 @@ export const decks: Deck[] = [
       "数据截止 2026 年 3 月，覆盖样本超过 200 家公司。建议先看第 12–18 页的市场结构图和第 30–36 页的投资地图，再回头读完整论述。",
     ],
     cover: "/covers/the-new-agi-landscape-2026-q1.png",
-    summary: "全球 AGI 赛道全景梳理",
+    summary: "战略组织与文化如何决定第二增长曲线",
   },
   {
     slug: "How-to-play-ai-beta",
@@ -66,7 +66,7 @@ export const decks: Deck[] = [
       "5. 一个理想的 AGI Basket：Google，Nvidia，OpenAI，Anthropic，ByteDance 和 TSMC；",
       "6. 模型即产品，数据即模型，阶跃式的产品体验提升往往还是来自于底层的模型换代，模型能力提升背后仍是数据 bet。",
     ],
-    summary: "AI Agent 平台变革",
+    summary: "模型即产品，数据即模型",
   },
   {
     slug: "founder-notes-ai-native-2025-q2",
@@ -77,7 +77,11 @@ export const decks: Deck[] = [
     embedUrl: "https://drive.google.com/file/d/19Wb_D6-MmVwUScVUXFi7LPAILImtkLS6/preview",
     featured: false,
     status: "published",
-    summary: "新一代创业者的工具栈",
+    intro: [
+      "过去一个季度,AI 的竞争从“谁的模型更强”切换到“谁的打法更对”，头部几家像 F1 竞赛,方向选错一次就可能掉队,而 Agent 在局部已经跑出 L4 级别的体验：",
+      "1. 模型在分化,没人稳赢、更没有躺赢,今天的 SOTA 在 3-6 个月后就是市场平均水平,头部几家像 F1 竞赛,犯错很容易直接掉队；\n2. AI Labs 走出两条路:横向全家桶(ChatGPT = AI 时代的 MS Office 套件)与纵向 Full Stack 整合(Google 的 TPU + Gemini + 存量场景),基础模型公司都要端到端做好 Agent,纯 API 生意壁垒不够;\n3. Agent 领域已经实现 L4 级别体验,ChatGPT Deep Research 和 Claude Code 是两个代表;Coding Agent 模式跑通之后,会持续向其他 AI Workspace 领域拓展;\n4. Anthropic all-in coding 是对 Cursor 最大的不利,Coding 能力是 FM 能力的子集,Cursor 想向下改数据分布,模型训练能力完全跟不上,最终会反映到用户体验上;\n5. Google 被严重低估,ChatGPT 和 Google 最终会殊途同归,Google AIO 在 AI Ads 上的探索比 Perplexity / ChatGPT 走得更深,Gemini 的后劲可能才是最强的;\n6. 做 AI 产品很像\"挖矿\",且有明确的时间保鲜窗口:第一个做出让用户惊叹的 Magic Moment,等于拿到 5 亿美金的免费营销;AI 创业范式正在变,每一次科技浪潮都会诞生新的 Native 基金,30 倍 DPI 的机会留给围绕主线找非共识的人。",
+    ],
+    summary: "Agent 在局部已经跑出 L4 级别的体验",
   },
   {
     slug: "agi-road-map-2025",
@@ -92,14 +96,13 @@ export const decks: Deck[] = [
       "在一个充满不确定性的 2025,技术进步反而是 AI 投资里最大的确定性。真正值得长期下注的主线其实只有一条：智能本身的提升。",
       "本篇报告是拾象团队对 2025 年 AGI 主线的一次系统梳理，目的是在动荡环境中找到最大的确定性,并识别出 2025 年最值得下注的技术与产品机会:",
       "1. 智能本身就是最大的应用，投资 AGI 的唯一主线是围绕“智能水平提升”去配置，当下正从 L2 Reasoner 走向 L3 Agents,每迈一级都会解锁全新智能场景；",
-      "2. 今天最大的非共识是 Pre-training 的空间还非常大:只有 pre-training 能涌现新能力，RL + post-training 是对潜力的最大化发掘但不涌现新能力,下一代 SOTA 仍会显著 beat 今天；",
+      "2. 今天最大的非共识是 Pre-training 的空间还非常大：只有 pre-training 能涌现新能力，RL + post-training 是对潜力的最大化发掘但不涌现新能力,下一代 SOTA 仍会显著 beat 今天；",
       "3. AGI 路线图开始分化：OpenAI 押注 O 系列 reasoning + 10 亿 DAU 的 killer app,Anthropic 押注 pre-training base model + Coding → Agentic AI,本质是“流量 or 智能”的路线之争；",
       "4. OpenAI 和 Anthropic 的领先优势极其恐怖,两家已拿走近 80% 的 LLM 产品营收。Anthropic 在做“Android”，OpenAI 在做“Apple”，LLM OS 的两种形态正在成形；",
       "5. Online Learning 是下一个范式级路线,允许模型自主探索并学习，reward model 设计会是新的关键卡点；",
-      "6. Coding + Agentic AI 是 AGI 时代抖音和微信级别的机会:第一幕把软件供给放大 100x，第二幕实现 Task Engine,把市场从 5000 万开发者拓展到 10 亿知识工作者；",
-      "7. 2030 年前会有多家市值超过 $10T 的公司诞生，Next Google / Next Windows / Next Office / Next Meta / Next Lilly 都在被重新定义。",
+      "6. Coding + Agentic AI 是 AGI 时代抖音和微信级别的机会：第一幕把软件供给放大 100x，第二幕实现 Task Engine,把市场从 5000 万开发者拓展到 10 亿知识工作者。",
     ],
-    summary: "2025 Q2 全球大模型的爆发性比以往更强，硅谷的各个模型公司开始分化到各个领域，比如除了 Google Gemini 和 OpenAI 还在做通用的模型，Anthropic 分化到 Coding、Agentic，Mira 的 Thinking Machines Lab 则分化到多模态和下一代交互。在过去 3 年，市场一直对智能上限的探索保持关注，但在刚刚过去的这两个月里，我们认为需要开始重视产品了：\n\n• 大模型在分化，当下 AI Labs 的路线选择有两个趋势：横向全家桶和纵向垂直整合，前者的例子是 ChatGPT，后者的代表是 Gemini；\n\n• 智能和产品都重要，ChatGPT 身上有很多非技术性壁垒，而 Coding 或模型公司只是技术壁垒；\n\n• 做 AI 产品很像挖矿，保鲜窗口很关键，这个窗口期明显在缩短；\n\n• ChatGPT 的 Deep Research 和 Anthropic 的 Claude Code 最早交付了 L4 级别的体验，分别对应信息搜索和软件开发；\n\n• 极端来说，Coding 公司不做模型的话，在未来是没有优势的，未来就是比拼成本。",
+    summary: "大模型在分化",
   },
 ];
 // SYNC:END

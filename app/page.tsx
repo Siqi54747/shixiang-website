@@ -1,13 +1,11 @@
 import Link from "next/link";
 import { copy } from "@/content/copy";
 import { ThesisWindow } from "@/components/ThesisWindow";
-import { getFeaturedDeck, formatMonthYear } from "@/content/decks";
+import { getFeaturedDeck } from "@/content/decks";
 
 export default function Home() {
   const featured = getFeaturedDeck();
-  const updatedLabel = featured
-    ? `${copy.hero.updatedLabel} ${formatMonthYear(featured.publishedDate)}`
-    : "";
+  const headline = copy.hero.headline.replace(/\.$/, "");
 
   return (
     <>
@@ -18,7 +16,8 @@ export default function Home() {
 
         <div className="mt-11 flex flex-col gap-[15px]">
           <h1 className="font-serif text-[56px] md:text-[72px] lg:text-[96px] leading-none tracking-[-0.02em] text-ink">
-            {copy.hero.headline}
+            {headline}
+            <span className="text-crimson">.</span>
           </h1>
           <p className="font-serif text-[32px] md:text-[42px] lg:text-[52px] leading-[1.2] text-muted">
             {copy.hero.subline}
@@ -35,15 +34,12 @@ export default function Home() {
           {featured ? (
             <Link
               href={`/reports/${featured.slug}`}
-              className="inline-flex items-center pb-1 text-[14px] text-ink w-fit whitespace-pre hover:underline hover:decoration-crimson hover:underline-offset-4"
+              className="inline-flex items-center pb-1 text-[16px] md:text-[17px] text-ink w-fit whitespace-pre hover:underline hover:decoration-crimson hover:underline-offset-4"
             >
               {copy.hero.cta}
             </Link>
           ) : (
             <span className="text-[14px] text-meta">No reports yet</span>
-          )}
-          {updatedLabel && (
-            <span className="text-[14px] text-meta">{updatedLabel}</span>
           )}
         </div>
       </section>

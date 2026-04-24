@@ -19,16 +19,24 @@
  *   - token rotation / quota hiccups would block production pushes
  *   - committed snapshots give us an obvious rollback unit
  *
- * Auth model:
- *   Piggyback on the local `lark-cli` install's logged-in user
- *   identity (Siqi). No separate Lark app / tenant token to manage.
- *   Prerequisite: the user has run `lark-cli auth login --domain base`
- *   at least once; the CLI refreshes tokens automatically thereafter.
- *   Since sync is always a local, manual operation (never in CI), a
- *   user-bound token is the right fit — no "headless bot app must be
- *   added as Base collaborator" step required.
+ * Auth model (2026-04-24 — switched from lark-cli user identity to
+ * a proper Lark self-built application):
+ *   `Shixiang-website-publish` 自建应用 issues a tenant_access_token,
+ *   which authorizes Bitable reads via the `bitable:app:readonly`
+ *   scope. The app must be added as a Base collaborator (Reader+).
+ *   This makes the sync CI-friendly (no personal token), unblocking
+ *   future webhook-triggered publishes.
+ *
+ *   Cover attachment downloads still need `drive:drive:readonly`,
+ *   which is pending admin approval. Until that scope lands, the
+ *   sync skips the network download and simply preserves whichever
+ *   cover file already lives in public/covers/<slug>.<ext>. New
+ *   cover uploads in Base will log a warning telling the operator
+ *   to place the file manually until the scope is approved.
  *
  * Required env vars (from .env.local or shell):
+ *   LARK_APP_ID           Self-built app's App ID (cli_…)
+ *   LARK_APP_SECRET       Self-built app's App Secret
  *   LARK_BASE_APP_TOKEN   Decks Base 的 app_token (URL 里的 /base/<token> 段)
  *   LARK_BASE_TABLE_ID    Decks 表的 table_id (tblXXXX)
  *
@@ -36,7 +44,6 @@
  * human workflow.
  */
 
-import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
@@ -60,40 +67,76 @@ function loadDotEnvLocal(): void {
 
 loadDotEnvLocal();
 
+const APP_ID = process.env.LARK_APP_ID;
+const APP_SECRET = process.env.LARK_APP_SECRET;
 const BASE_APP_TOKEN = process.env.LARK_BASE_APP_TOKEN;
 const BASE_TABLE_ID = process.env.LARK_BASE_TABLE_ID;
 
-if (!BASE_APP_TOKEN || !BASE_TABLE_ID) {
+if (!APP_ID || !APP_SECRET || !BASE_APP_TOKEN || !BASE_TABLE_ID) {
   console.error(
-    "[sync-decks] Missing env vars: LARK_BASE_APP_TOKEN / LARK_BASE_TABLE_ID."
+    "[sync-decks] Missing env vars: need LARK_APP_ID + LARK_APP_SECRET + LARK_BASE_APP_TOKEN + LARK_BASE_TABLE_ID."
   );
   console.error(
-    "[sync-decks] Copy .env.local.example to .env.local and fill the 2 Base identifiers."
+    "[sync-decks] Copy .env.local.example to .env.local and fill all four."
   );
   process.exit(1);
 }
 
-// ----- Lark CLI client ---------------------------------------------------
+// ----- Lark OpenAPI client -----------------------------------------------
 //
-// Every Lark interaction shells out to `lark-cli` with --as user so we
-// ride on whoever did `lark-cli auth login` locally. Errors from the
-// CLI bubble up via the stderr of its child process.
+// Direct fetch against open.feishu.cn using a tenant_access_token issued
+// to the `Shixiang-website-publish` self-built app. Token is cached for
+// the duration of the process (sync runs are single-shot, ~5s).
 
-function larkCli(args: string[]): string {
-  try {
-    const out = execFileSync("lark-cli", args, {
-      encoding: "utf-8",
-      maxBuffer: 64 * 1024 * 1024,
-    });
-    return out;
-  } catch (err) {
-    const e = err as { status?: number; stderr?: Buffer | string; stdout?: Buffer | string; message?: string };
-    const stderr = e.stderr ? e.stderr.toString() : "";
-    const stdout = e.stdout ? e.stdout.toString() : "";
+const LARK_HOST = "https://open.feishu.cn";
+
+let cachedTenantToken: string | undefined;
+
+async function getTenantAccessToken(): Promise<string> {
+  if (cachedTenantToken) return cachedTenantToken;
+  const res = await fetch(`${LARK_HOST}/open-apis/auth/v3/tenant_access_token/internal`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ app_id: APP_ID, app_secret: APP_SECRET }),
+  });
+  const body = (await res.json()) as { code: number; msg?: string; tenant_access_token?: string };
+  if (!res.ok || body.code !== 0 || !body.tenant_access_token) {
     throw new Error(
-      `lark-cli ${args.join(" ")} failed (code=${e.status ?? "?"}): ${stderr || stdout || e.message || "unknown"}`
+      `tenant_access_token request failed (http=${res.status}, code=${body.code}): ${body.msg ?? "unknown"}`
     );
   }
+  cachedTenantToken = body.tenant_access_token;
+  return cachedTenantToken;
+}
+
+interface LarkApiResponse<T> {
+  code: number;
+  msg?: string;
+  data?: T;
+}
+
+async function larkApi<T>(method: string, path: string, query?: Record<string, string | number | undefined>): Promise<T> {
+  const token = await getTenantAccessToken();
+  const url = new URL(`${LARK_HOST}${path}`);
+  if (query) {
+    for (const [k, v] of Object.entries(query)) {
+      if (v !== undefined) url.searchParams.set(k, String(v));
+    }
+  }
+  const res = await fetch(url, {
+    method,
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+  });
+  const body = (await res.json()) as LarkApiResponse<T>;
+  if (!res.ok || body.code !== 0) {
+    throw new Error(
+      `${method} ${path} failed (http=${res.status}, code=${body.code}): ${body.msg ?? JSON.stringify(body).slice(0, 200)}`
+    );
+  }
+  if (body.data === undefined) {
+    throw new Error(`${method} ${path} returned no data`);
+  }
+  return body.data;
 }
 
 interface BaseRecord {
@@ -102,67 +145,30 @@ interface BaseRecord {
 }
 
 /**
- * Fetch all records from the configured Base table, normalized to the
- * { record_id, fields: { <colName>: <val> } } shape the rest of this
- * script expects.
+ * Fetch all records from the configured Base table via the Bitable
+ * v1 list-records endpoint. The OpenAPI shape already matches our
+ * BaseRecord interface (record_id + fields-as-object), no zipping
+ * needed unlike the prior lark-cli tabular format.
  *
- * lark-cli's +record-list returns a tabular format rather than a list
- * of record objects:
- *   {
- *     data: {
- *       fields: ["Slug", "Intro", ...],       // column names, in order
- *       data: [["slug1", "...", ...], ...],   // each sub-array = one row
- *       record_id_list: ["recXXX", ...],
- *       has_more, ...
- *     }
- *   }
- * We zip `fields` with each row to rebuild a per-record dict.
+ * Pagination via page_token; safety cap of 20 pages × 100 records.
  */
-function fetchAllRecords(): BaseRecord[] {
+async function fetchAllRecords(): Promise<BaseRecord[]> {
   const all: BaseRecord[] = [];
-  let offset = 0;
-  const limit = 100;
+  let pageToken: string | undefined;
   for (let page = 0; page < 20; page++) {
-    const raw = larkCli([
-      "base",
-      "+record-list",
-      "--base-token",
-      BASE_APP_TOKEN as string,
-      "--table-id",
-      BASE_TABLE_ID as string,
-      "--limit",
-      String(limit),
-      "--offset",
-      String(offset),
-      "--as",
-      "user",
-    ]);
-    const body = JSON.parse(raw) as {
-      ok: boolean;
-      data?: {
-        data?: unknown[][];
-        fields?: string[];
-        record_id_list?: string[];
-        has_more?: boolean;
-      };
-      error?: unknown;
-    };
-    if (!body.ok || !body.data) {
-      throw new Error(`record-list failed: ${JSON.stringify(body.error ?? body)}`);
+    const data = await larkApi<{
+      items?: BaseRecord[];
+      page_token?: string;
+      has_more?: boolean;
+    }>("GET", `/open-apis/bitable/v1/apps/${BASE_APP_TOKEN}/tables/${BASE_TABLE_ID}/records`, {
+      page_size: 100,
+      page_token: pageToken,
+    });
+    for (const item of data.items ?? []) {
+      all.push({ record_id: item.record_id, fields: item.fields ?? {} });
     }
-    const colNames = body.data.fields ?? [];
-    const rows = body.data.data ?? [];
-    const ids = body.data.record_id_list ?? [];
-    for (let i = 0; i < rows.length; i++) {
-      const fields: Record<string, unknown> = {};
-      const row = rows[i];
-      for (let c = 0; c < colNames.length; c++) {
-        fields[colNames[c]] = row[c];
-      }
-      all.push({ record_id: ids[i] ?? "", fields });
-    }
-    if (!body.data.has_more || rows.length === 0) break;
-    offset += rows.length;
+    if (!data.has_more || !data.page_token) break;
+    pageToken = data.page_token;
   }
   return all;
 }
@@ -196,10 +202,14 @@ function readText(v: unknown): string {
 }
 
 function readIsoDate(v: unknown): string {
-  // Base date fields come as ms-epoch numbers
+  // Base date fields come as ms-epoch numbers. Operations pick a date
+  // in their UTC+8 calendar; the Base stores it as midnight Beijing
+  // time (e.g. 2026-04-01 → epoch 1743436800000 = 2026-03-31T16:00:00Z).
+  // Naively slicing toISOString() loses a day. Shift by +8h before
+  // slicing so the YYYY-MM-DD matches what the operator sees in Base.
   if (typeof v === "number") {
-    const d = new Date(v);
-    if (Number.isFinite(d.getTime())) return d.toISOString().slice(0, 10);
+    const shifted = new Date(v + 8 * 60 * 60 * 1000);
+    if (Number.isFinite(shifted.getTime())) return shifted.toISOString().slice(0, 10);
   }
   const s = readText(v).trim();
   // Accept YYYY-MM-DD or YYYY/MM/DD directly
@@ -218,14 +228,18 @@ function readCheckbox(v: unknown): boolean {
 }
 
 function readSingleSelect(v: unknown): string {
-  // lark-cli returns single-select as ["optionName"]; readText
-  // joins array elements so this collapses to the option name.
+  // OpenAPI returns single-select as a plain option-name string
+  // (e.g. "published"); historic lark-cli wrapping returned an
+  // array, which readText also flattens — works for both.
   return readText(v).trim();
 }
 
 function readUrl(v: unknown): string {
-  // The Base URL column, when fetched via lark-cli, serializes as
-  // "[url](url)" Markdown. Strip that shell to get the bare href.
+  // Bitable URL column comes back as { text, link } via the
+  // OpenAPI; readText extracts `text` (= the URL the operator
+  // pasted). We also keep a tolerance for "[url](url)" markdown
+  // wrapping, in case anyone hand-edits the column type to
+  // multi-line text.
   const s = readText(v).trim();
   const m = s.match(/^\[(.+?)\]\((.+?)\)$/);
   return m ? (m[2] || m[1]) : s;
@@ -297,67 +311,35 @@ function readFirstAttachment(v: unknown): AttachmentRef | undefined {
 }
 
 /**
- * Download a cover attachment to public/covers/<slug>.<ext>.
+ * Resolve the local cover path for a deck whose Base record carries
+ * a Cover attachment. We do NOT download anything here — the
+ * `drive:drive:readonly` scope on the self-built app is still under
+ * admin review, so the network fetch would 403.
  *
- * Shells out to `lark-cli api GET /open-apis/drive/v1/medias/<token>/download`
- * with `--as user` (same identity used for record-list). lark-cli
- * handles user-token refresh and writes the binary response straight
- * to the `-o` path.
+ * Strategy until the scope lands:
+ *   - if a file already exists at public/covers/<slug>.<ext> for any
+ *     supported ext, reuse it (preserves the featured deck's cover
+ *     across syncs)
+ *   - if Base has a Cover attachment but no local file, log a warning
+ *     so the operator knows to drop the file in by hand
  *
- * File extension strategy:
- *   1. Prefer the extension from the attachment's original `name`.
- *   2. Fall back to `.jpg` if nothing sensible is there.
- *
- * Returns the public path (`/covers/<slug>.<ext>`) on success, or
- * undefined on failure (warn logged, not thrown — a missing cover
- * should never block the sync of the remaining data).
+ * Once `drive:drive:readonly` is approved, swap this function back
+ * to a real download via `larkApi("GET", "/open-apis/drive/v1/medias/<token>/download")`
+ * (note: that endpoint returns binary, so it'll need a fetch path
+ * separate from `larkApi<T>`).
  */
-function downloadCover(
-  attachment: AttachmentRef,
-  slug: string
-): string | undefined {
-  const nameExt = attachment.name.match(/\.([a-zA-Z0-9]+)$/)?.[1]?.toLowerCase();
-  const ext =
-    nameExt && /^(jpg|jpeg|png|webp|gif|avif)$/.test(nameExt)
-      ? nameExt === "jpeg"
-        ? "jpg"
-        : nameExt
-      : "jpg";
+const COVER_EXT_PRIORITY = ["png", "jpg", "jpeg", "webp", "gif", "avif"] as const;
 
-  // lark-cli's --output rejects absolute paths ("unsafe output path"
-  // error), so we hand it a cwd-relative path and let the shell-out
-  // resolve from wherever sync-decks was invoked. npm scripts always
-  // run from the repo root so `public/covers/...` resolves correctly.
+function findExistingCover(slug: string): string | undefined {
   const outDir = resolve("public/covers");
   if (!existsSync(outDir)) mkdirSync(outDir, { recursive: true });
-  const relOutPath = `public/covers/${slug}.${ext}`;
-  const absOutPath = resolve(relOutPath);
-
-  try {
-    larkCli([
-      "api",
-      "GET",
-      `/open-apis/drive/v1/medias/${attachment.file_token}/download`,
-      "--as",
-      "user",
-      "-o",
-      relOutPath,
-    ]);
-  } catch (err) {
-    console.warn(
-      `[sync-decks] cover download failed for '${slug}': ${(err as Error).message.slice(0, 200)}`
-    );
-    return undefined;
+  for (const ext of COVER_EXT_PRIORITY) {
+    if (existsSync(resolve(outDir, `${slug}.${ext}`))) {
+      const normExt = ext === "jpeg" ? "jpg" : ext;
+      return `/covers/${slug}.${normExt}`;
+    }
   }
-
-  if (!existsSync(absOutPath)) {
-    console.warn(
-      `[sync-decks] cover download for '${slug}' produced no file at ${absOutPath}`
-    );
-    return undefined;
-  }
-  console.log(`[sync-decks] cover downloaded: ${absOutPath}`);
-  return `/covers/${slug}.${ext}`;
+  return undefined;
 }
 
 // ----- Deck shape (matches content/decks.ts Deck interface) --------------
@@ -504,23 +486,29 @@ function overwriteDecksArray(newBody: string): void {
 
 // ----- main --------------------------------------------------------------
 
-function main() {
-  console.log("[sync-decks] fetching records from Base via lark-cli...");
-  const records = fetchAllRecords();
+async function main(): Promise<void> {
+  console.log("[sync-decks] fetching records from Base via Lark OpenAPI...");
+  const records = await fetchAllRecords();
   console.log(`[sync-decks] received ${records.length} records`);
 
   const decks = records.map(recordToDeck);
   validateDecks(decks);
 
-  // Pair each record back to its deck so we can pull the Cover
-  // attachment column (non-primitive, handled outside recordToDeck).
-  // Serial — lark-cli shells one process per call and the cover count
-  // is always tiny.
+  // Pair each record back to its deck so we can resolve the Cover
+  // column (attachments are non-primitive, handled outside recordToDeck).
+  // Until drive:drive:readonly is approved we don't download — we just
+  // surface whichever file already lives in public/covers/.
   for (let i = 0; i < records.length; i++) {
     const att = readFirstAttachment(records[i].fields[COL.cover]);
     if (!att) continue;
-    const localPath = downloadCover(att, decks[i].slug);
-    if (localPath) decks[i].cover = localPath;
+    const localPath = findExistingCover(decks[i].slug);
+    if (localPath) {
+      decks[i].cover = localPath;
+    } else {
+      console.warn(
+        `[sync-decks] cover attachment present in Base for '${decks[i].slug}' but no local file at public/covers/${decks[i].slug}.{png,jpg,…}. Drop it in manually until drive:drive:readonly is approved.`
+      );
+    }
   }
 
   // Sort newest first — matches getPublishedDecks() default ordering
@@ -534,9 +522,7 @@ function main() {
   console.log("[sync-decks] next: git diff content/decks.ts");
 }
 
-try {
-  main();
-} catch (err) {
+main().catch((err) => {
   console.error("[sync-decks] FAILED:", err instanceof Error ? err.message : err);
   process.exit(1);
-}
+});

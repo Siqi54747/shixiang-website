@@ -28,7 +28,7 @@ export const copy = {
   },
   thesis: {
     filename: "shixiang-agi-thesis.md",
-    command: "$ cat thesis.md",
+    command: "$ cat what-we-bet-on.md",
     updatedLabel: "UPDATED",
     branch: "main",
     ready: "ready",

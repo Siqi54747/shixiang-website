@@ -37,7 +37,8 @@ export const decks: Deck[] = [
     subtitle: "2026 全球 AGI 赛道全景梳理",
     quarter: "2026 Q1",
     publishedDate: "2026-04-01",
-    embedUrl: "https://drive.google.com/file/d/1M98axRY6TyJQhYE0Z3O102N938yMgtUP/preview",
+    embedUrl: "https://drive.google.com/file/d/1TdbkYJxK32VgP4yAPnfKOKaszrGOYxK1/preview",
+    embedUrlCn: "https://shixiangtech.feishu.cn/file/LX3ebJ4Shoa6UPx8228cEjRCnIe?from=from_copylink",
     featured: true,
     status: "published",
     intro: [
@@ -55,6 +56,7 @@ export const decks: Deck[] = [
     quarter: "2025 Q4",
     publishedDate: "2026-02-02",
     embedUrl: "https://drive.google.com/file/d/1EliRn7QLPDRTuCt1xvsQQlu0ZqqNjTKk/preview",
+    embedUrlCn: "https://shixiangtech.feishu.cn/file/XxljbAAGbodmnKxC0yFcq7TinKd?from=from_copylink",
     featured: false,
     status: "published",
     intro: [
@@ -70,12 +72,13 @@ export const decks: Deck[] = [
     summary: "模型即产品，数据即模型",
   },
   {
-    slug: "founder-notes-ai-native-2025-q2",
+    slug: "agi-notes-2025-q2",
     title: "Road to AGI L4",
     subtitle: "分化与收敛、全家桶、Full Stack",
     quarter: "2025 Q3",
     publishedDate: "2025-08-14",
     embedUrl: "https://drive.google.com/file/d/19Wb_D6-MmVwUScVUXFi7LPAILImtkLS6/preview",
+    embedUrlCn: "https://shixiangtech.feishu.cn/file/RqJxb8O73okLjAxIi7FcILZEn2x?from=from_copylink",
     featured: false,
     status: "published",
     intro: [
@@ -96,6 +99,7 @@ export const decks: Deck[] = [
     quarter: "2025 Q2",
     publishedDate: "2025-05-14",
     embedUrl: "https://drive.google.com/file/d/1_H_PiCGUXGu40cud43kAUjaTFcCgCZJr/preview",
+    embedUrlCn: "https://shixiangtech.feishu.cn/file/LiDnbXn2Gomrrvx4WKOcL7eznve?from=from_copylink",
     featured: false,
     status: "published",
     intro: [

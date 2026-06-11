@@ -414,3 +414,35 @@ Reports 场景不同:
 - **webhook 自动触发 Vercel rebuild**:运营 Base 改完即时反映到线上。代价:Vercel deploy hook URL + 飞书 webhook 配置。触发条件:季度 4+ 篇节奏时或运营要求实时
 - **字段扩展**:加 `author` / `downloadCount` / `tags` 等,Base 先加列 → sync 脚本加 getter → `Deck` interface 加字段
 
+---
+
+## 2026-06-10: 域名迁移 — 主域名切到 shixiang.com
+
+### 决策
+
+主域名从 `shixiangcap.com` 迁到 `shixiang.com`。旧域名 `shixiangcap.com`、`www.shixiangcap.com` 全部保留并 308 永久跳转至新域名;`www.shixiang.com` 同样 308 跳到裸域,裸域 `shixiang.com` 为 canonical。
+
+### 落地方式
+
+- 四个域名挂在同一个 Vercel 项目,用 Vercel Dashboard 原生 redirect,不写代码
+- `shixiang.com` 走 Vercel DNS(NS 指向 `ns1/ns2.vercel-dns.com`),裸域 + www 的 A 记录由 Vercel 自动管理(`64.29.17.x` / `216.198.79.x`)
+- `shixiangcap.com` 仍在原注册商 + Cloudflare,DNS 不动,只在 Vercel 内部从 primary 改成 redirect
+
+### 终态(2026-06-10 实测)
+
+| 域名 | 行为 |
+|------|------|
+| `shixiang.com` | HTTP 200,主域名 |
+| `www.shixiang.com` | 308 → `shixiang.com` |
+| `shixiangcap.com` | 308 → `shixiang.com` |
+| `www.shixiangcap.com` | 308 → `shixiang.com` |
+
+### 踩过的坑
+
+迁移当天 `www.shixiang.com` 在本机 `curl` 超时,一度误判为 Vercel 配置错误。真相是本机系统 DNS(阿里云 `100.100.100.100`)缓存了该域名早年指向阿里云服务器的旧 A 记录 `8.219.1.75`——缓存假象,非配置问题。直接问 Vercel 权威 NS(`ns1.vercel-dns.com`)返回正确 IP,Google / Cloudflare resolver 也都正确,旧缓存随 TTL 过期自愈。教训:跨域名迁移验证别只信本机 resolver,要用多个公共 resolver + 直接查权威 NS 对比。
+
+### 待跟进(代码 / 物料里的旧域名)
+
+- `content/copy.ts` 的 `site.url`、`contactEmail`,以及 `app/api/og/route.tsx` 的 OG 图签名仍是旧域名,需逐处确认后更新(canonical / OG 应指向新主域名)
+- 对外物料(微信菜单 / 名片 / LP 材料 / email 签名 / 微博 bio)同步换到 `shixiang.com`,参考 `docs/site-ops-runbook.md`
+

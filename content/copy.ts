@@ -5,7 +5,7 @@ export const copy = {
     tagline: "Research first.",
     description:
       "拾象是一家研究驱动的科技投资基金。Research the curve. Bet the decade.",
-    url: "https://shixiangcap.com",
+    url: "https://shixiang.com",
   },
   nav: {
     reports: "AGI Reports",

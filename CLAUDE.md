@@ -32,6 +32,7 @@
 - **本机 `next build` 会卡 jest-worker 死锁**（9 分钟+），不要重复踩
   - 本地只跑 `npx tsc --noEmit` 验证类型
   - 真正的 build 交给 Vercel Linux builder
+- **`/api/og` 在本机 `next dev` 首次渲染会卡**（`@vercel/og` edge route 本机限制，与 build 卡死同源）：改 OG 图靠 `tsc` + 线上验证（push 后 `curl -o /tmp/og.png https://shixiang.com/api/og` 下载图片肉眼看签名），别本机起 dev server 干等
 - Git author `107621758+Siqi54747@users.noreply.github.com`（Vercel author-check 依赖）
 
 ## UI 改动的验证流程

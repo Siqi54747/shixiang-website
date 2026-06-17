@@ -92,7 +92,7 @@ export const copy = {
   },
   footer: {
     contactLabel: "CONTACT",
-    contactEmail: "investment@shixiangcap.com",
+    contactEmail: "investment@shixiang.com",
     officesLabel: "OFFICES",
     offices: "Beijing  ·  Shanghai  ·  Hong Kong",
     wechatLabel: "WECHAT",

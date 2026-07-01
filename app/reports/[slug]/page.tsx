@@ -6,7 +6,10 @@ import {
   getPublishedDecks,
   formatMonthYear,
   getDriveThumbnailUrl,
+  getDeckSubtitle,
+  getDeckIntro,
 } from "@/content/decks";
+import { getLocale } from "@/lib/locale-server";
 import { DeckEmbed } from "@/components/DeckEmbed";
 import { ShareBar } from "@/components/ShareBar";
 
@@ -21,13 +24,19 @@ export function generateStaticParams() {
 export function generateMetadata({ params }: Params) {
   const deck = getDeckBySlug(params.slug);
   if (!deck) return {};
+  const locale = getLocale();
+  const t = copy[locale];
   // SEO description priority:
   //   1. explicit `summary` (ops-authored one-liner tuned for search)
   //   2. first paragraph of the Reading Guide
-  //   3. the CN subtitle as a last-resort fallback
-  // Ops can leave Summary empty on most decks and only fill it when a
-  // bespoke meta description improves discoverability.
-  const description = deck.summary ?? deck.intro?.[0] ?? deck.subtitle;
+  //   3. the subtitle as a last-resort fallback
+  // In English mode the `summary` (which is CN-only) is skipped in favor
+  // of the English reading guide / subtitle so the meta description
+  // matches the page language.
+  const description =
+    locale === "en"
+      ? getDeckIntro(deck, locale)?.[0] ?? getDeckSubtitle(deck, locale)
+      : deck.summary ?? deck.intro?.[0] ?? deck.subtitle;
   // OG image: use the deck PDF's first page via Google Drive's
   // public thumbnail endpoint. Every deck whose Drive file is
   // "Anyone with the link" already has this image auto-generated
@@ -36,7 +45,7 @@ export function generateMetadata({ params }: Params) {
   const driveThumb = getDriveThumbnailUrl(deck);
   const ogUrl = driveThumb ?? `/api/og?slug=${encodeURIComponent(deck.slug)}`;
   return {
-    title: `${deck.title} · ${copy.site.name}`,
+    title: `${deck.title} · ${t.site.name}`,
     description,
     openGraph: {
       title: deck.title,
@@ -57,13 +66,17 @@ export default function ReportDetailPage({ params }: Params) {
   const deck = getDeckBySlug(params.slug);
   if (!deck) return notFound();
 
+  const locale = getLocale();
+  const t = copy[locale];
+  const intro = getDeckIntro(deck, locale);
+
   return (
     <article className="px-6 md:px-24 py-6 md:py-8 max-w-[1600px] mx-auto">
       <Link
         href="/reports"
         className="inline-block text-[14px] text-ink hover:text-crimson transition-colors"
       >
-        {copy.reportDetail.back}
+        {t.reportDetail.back}
       </Link>
 
       <p className="mt-5 text-[14px] text-crimson font-medium tracking-wide">
@@ -74,7 +87,7 @@ export default function ReportDetailPage({ params }: Params) {
         {deck.title}
       </h1>
 
-      <p className="mt-3 text-[14px] text-muted">By 拾象投研团队</p>
+      <p className="mt-3 text-[14px] text-muted">{t.reportDetail.byline}</p>
 
       <div className="mt-6 flex flex-col gap-8 lg:grid lg:grid-cols-3 lg:gap-12 lg:items-start">
         {/* Left column: iframe + share bar centered beneath it.
@@ -96,17 +109,17 @@ export default function ReportDetailPage({ params }: Params) {
         <aside className="lg:col-span-1 min-w-0">
           <section className="border-l-2 border-crimson bg-[#F3F1EA] px-6 py-5 flex flex-col gap-3 lg:max-h-[calc((min(100vw,1600px)-240px)*0.375+94px)] lg:overflow-y-auto">
             <p className="text-[11px] tracking-label uppercase text-meta">
-              {copy.reportDetail.introTitle}
+              {t.reportDetail.introTitle}
             </p>
-            {deck.intro && deck.intro.length > 0 ? (
+            {intro && intro.length > 0 ? (
               <div className="flex flex-col gap-[10px] text-[14px] leading-[1.55] text-ink">
-                {deck.intro.map((para, i) => (
+                {intro.map((para, i) => (
                   <p key={i}>{para}</p>
                 ))}
               </div>
             ) : (
               <p className="text-[14px] text-meta italic">
-                {copy.reportDetail.introPlaceholder}
+                {t.reportDetail.introPlaceholder}
               </p>
             )}
           </section>

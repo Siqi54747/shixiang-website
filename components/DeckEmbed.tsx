@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { copy } from "@/content/copy";
+import { useLocale } from "./LocaleProvider";
 
 interface DeckEmbedProps {
   url: string;          // canonical (usually Google Drive /preview)
@@ -91,6 +92,7 @@ function useCnReader(): boolean {
  */
 export function DeckEmbed({ url, urlCn, title }: DeckEmbedProps) {
   const preferCn = useCnReader();
+  const t = copy[useLocale()].reportDetail;
 
   if (preferCn && urlCn) {
     return (
@@ -99,10 +101,10 @@ export function DeckEmbed({ url, urlCn, title }: DeckEmbedProps) {
         target="_blank"
         rel="noopener noreferrer"
         className="aspect-video w-full border border-rule bg-cream flex items-center justify-center hover:bg-[#F3F1EA] transition-colors group"
-        aria-label={`${title} — ${copy.reportDetail.cnOpenCta}`}
+        aria-label={`${title} — ${t.cnOpenCta}`}
       >
         <span className="bg-crimson text-rule text-[13px] md:text-[14px] uppercase tracking-wide px-5 py-3 rounded-md group-hover:bg-[#8B1B25] transition-colors">
-          {copy.reportDetail.cnOpenCta}
+          {t.cnOpenCta}
         </span>
       </a>
     );
@@ -112,7 +114,7 @@ export function DeckEmbed({ url, urlCn, title }: DeckEmbedProps) {
   if (!chosen) {
     return (
       <div className="aspect-video w-full border border-rule bg-cream flex items-center justify-center text-meta text-sm">
-        {copy.reportDetail.embedPlaceholder}
+        {t.embedPlaceholder}
       </div>
     );
   }

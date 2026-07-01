@@ -1,7 +1,21 @@
-export const copy = {
+import type { Locale } from "@/lib/i18n";
+
+/**
+ * All site UI copy, keyed by locale. `zh` is the source of truth for
+ * structure; `en` MUST mirror its shape exactly (enforced by the
+ * `CopyTree` type below). Consumers pick a tree with `copy[locale]`
+ * (server: from getLocale(); client: from useLocale()).
+ *
+ * Deck/report *content* (subtitle, reading guide) is NOT here — it
+ * lives in content/decks.ts with parallel `subtitleEn` / `introEn`
+ * fields, because it's synced from 飞书 Base. The Thesis terminal
+ * entries below are on-site descriptions only; each `href` still points
+ * to the original Chinese WeChat article (those can't be translated).
+ */
+
+const zh = {
   site: {
     name: "拾象科技",
-    nameEn: "Shixiang Tech",
     tagline: "Research first.",
     description:
       "拾象是一家研究驱动的科技投资基金。Research the curve. Bet the decade.",
@@ -24,7 +38,7 @@ export const copy = {
   },
   focusGrid: {
     // Deprecated 2026-04-20: replaced by the Thesis terminal-window component. Kept so nothing breaks if an old reference lingers.
-    items: ["AGI Labs", "Robotics", "AI for Science", "Agent-Native"] as const,
+    items: ["AGI Labs", "Robotics", "AI for Science", "Agent-Native"],
   },
   thesis: {
     filename: "shixiang-agi-thesis.md",
@@ -70,9 +84,11 @@ export const copy = {
   reportsList: {
     featuredEyebrow: "LATEST REPORT",
     featuredCta: "View full report →",
+    comingSoon: "Coming Soon",
   },
   reportDetail: {
     back: "← Back to Reports",
+    byline: "By 拾象投研团队",
     introTitle: "READING GUIDE",
     introPlaceholder: "导读内容即将发布。",
     shareTitle: "SHARE THIS REPORT",
@@ -99,4 +115,114 @@ export const copy = {
     wechatHandle: "@海外独角兽",
     copyright: `© ${new Date().getFullYear()}  SHIXIANG TECH  ·  拾象科技`,
   },
-} as const;
+};
+
+/** English mirror of `zh`. Must keep the same key shape. */
+const en: CopyTree = {
+  site: {
+    name: "Shixiang Tech",
+    tagline: "Research first.",
+    description:
+      "Shixiang is a research-driven technology investment fund. Research the curve. Bet the decade.",
+    url: "https://shixiang.com",
+  },
+  nav: {
+    reports: "AGI Reports",
+    insights: "Explore Insights",
+  },
+  hero: {
+    eyebrow: "Research the curve. Bet the decade.",
+    headline: "Research first.",
+    subline: "Powering the great voyage of technology.",
+    intro: [
+      "Shixiang believes intelligence is the most fundamental variable of our era.",
+      "We navigate cycles through research, and partner with frontier founders and technology entrepreneurs to bet on the new species that will define the next decade.",
+    ],
+    cta: "Get our latest reports →",
+    updatedLabel: "Updated",
+  },
+  focusGrid: {
+    items: ["AGI Labs", "Robotics", "AI for Science", "Agent-Native"],
+  },
+  thesis: {
+    filename: "shixiang-agi-thesis.md",
+    command: "$ cat what-we-bet-on.md",
+    updatedLabel: "UPDATED",
+    branch: "main",
+    ready: "ready",
+    entries: [
+      {
+        slug: "agi-labs",
+        tag: "AGI Labs",
+        desc: "Model capability remains the core variable of value creation",
+        sub: "Global Tier-1 AI Labs · Neo Labs · LLM-native Infra",
+        href: "https://mp.weixin.qq.com/s/cLyenxqPX71L0zTSy2uYGQ",
+      },
+      {
+        slug: "robotics",
+        tag: "Robotics",
+        desc: "VLA will unlock the ChatGPT moment for general-purpose robots",
+        sub: "Robotics Hardware · Simulation & Data · Foundation Models for Robotics",
+        href: "https://mp.weixin.qq.com/s/n695VewySScJkJxpl9rcdg",
+      },
+      {
+        slug: "ai-for-science",
+        tag: "AI for Science",
+        desc: "AI is rebuilding the paradigm of scientific discovery — the next billion-dollar molecule will come from AI",
+        sub: "AI Drug Discovery · AI Materials · Research Agents",
+        href: "https://mp.weixin.qq.com/s/Tn4vpyXf6S00WOEh05tpqg",
+      },
+      {
+        slug: "agent-native",
+        tag: "Agent-Native",
+        desc: "Agents are forming a new internet and will drive the next rewrite of software",
+        sub: "Coding Agents · Infra for Agents · Vertical Agents",
+        href: "https://mp.weixin.qq.com/s/9I2GccOVm_2hNzLGlaZ5_g",
+      },
+    ],
+  },
+  reportsList: {
+    featuredEyebrow: "LATEST REPORT",
+    featuredCta: "View full report →",
+    comingSoon: "Coming Soon",
+  },
+  reportDetail: {
+    back: "← Back to Reports",
+    byline: "By the Shixiang Research Team",
+    introTitle: "READING GUIDE",
+    introPlaceholder: "Reading guide coming soon.",
+    shareTitle: "SHARE THIS REPORT",
+    shareWechat: "WeChat",
+    shareTwitter: "X",
+    shareCopyLink: "Copy link",
+    shareCopied: "Copied",
+    shareWechatToast: "Link copied — paste it into WeChat to share",
+    embedPlaceholder: "Deck preview (coming soon)",
+    cnOpenCta: "Open PDF in Feishu →",
+  },
+  wechatModal: {
+    label: "WECHAT",
+    title: "Follow 海外独角兽 on WeChat",
+    hint: "Scan the QR code for frontier research",
+    close: "Close",
+  },
+  footer: {
+    contactLabel: "CONTACT",
+    contactEmail: "investment@shixiang.com",
+    officesLabel: "OFFICES",
+    offices: "Beijing  ·  Shanghai  ·  Hong Kong",
+    wechatLabel: "WECHAT",
+    wechatHandle: "@海外独角兽",
+    copyright: `© ${new Date().getFullYear()}  SHIXIANG TECH`,
+  },
+};
+
+/** Shape both locales share — `en` is type-checked against the `zh` tree. */
+export type CopyTree = typeof zh;
+
+export const copy: Record<Locale, CopyTree> = { zh, en };
+
+/** Convenience accessor. */
+export function getCopy(locale: Locale): CopyTree {
+  return copy[locale];
+}

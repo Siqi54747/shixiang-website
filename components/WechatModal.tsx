@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect } from "react";
 import { copy } from "@/content/copy";
+import { useLocale } from "./LocaleProvider";
 
 interface WechatModalProps {
   open: boolean;
@@ -10,6 +11,7 @@ interface WechatModalProps {
 }
 
 export function WechatModal({ open, onClose }: WechatModalProps) {
+  const t = copy[useLocale()].wechatModal;
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -33,7 +35,7 @@ export function WechatModal({ open, onClose }: WechatModalProps) {
       onClick={onClose}
       role="dialog"
       aria-modal="true"
-      aria-label={copy.wechatModal.title}
+      aria-label={t.title}
     >
       <div
         className="bg-cream rounded-lg p-8 md:p-10 max-w-sm w-full relative shadow-2xl"
@@ -42,25 +44,25 @@ export function WechatModal({ open, onClose }: WechatModalProps) {
         <button
           onClick={onClose}
           className="absolute top-3 right-4 text-meta hover:text-ink text-2xl leading-none transition-colors"
-          aria-label={copy.wechatModal.close}
+          aria-label={t.close}
         >
           ×
         </button>
         <div className="text-center">
           <p className="text-[11px] tracking-label uppercase text-meta mb-5">
-            {copy.wechatModal.label}
+            {t.label}
           </p>
           <div className="mx-auto w-[220px] h-[220px] relative">
             <Image
               src="/images/wechat-qr.jpg"
-              alt={copy.wechatModal.title}
+              alt={t.title}
               fill
               sizes="220px"
               className="object-contain"
             />
           </div>
-          <p className="mt-5 text-base text-ink">{copy.wechatModal.title}</p>
-          <p className="mt-1 text-xs text-meta">{copy.wechatModal.hint}</p>
+          <p className="mt-5 text-base text-ink">{t.title}</p>
+          <p className="mt-1 text-xs text-meta">{t.hint}</p>
         </div>
       </div>
     </div>

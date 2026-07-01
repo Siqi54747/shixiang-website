@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { copy } from "@/content/copy";
+import { useLocale } from "./LocaleProvider";
 
 /**
  * Footer-embedded WeChat popover (not a full-screen modal).
@@ -11,6 +12,7 @@ import { copy } from "@/content/copy";
  * triangle. Spec: shixiang-thesis-section-spec-v3.md §8.2.
  */
 export function WechatPopover() {
+  const t = copy[useLocale()];
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
@@ -54,30 +56,30 @@ export function WechatPopover() {
         }}
         aria-haspopup="dialog"
         aria-expanded={open}
-        aria-label={copy.wechatModal.title}
+        aria-label={t.wechatModal.title}
         className="font-serif text-[18px] text-ink hover:text-crimson transition-colors cursor-pointer bg-transparent border-0 p-0 font-inherit"
       >
-        {copy.footer.wechatHandle}
+        {t.footer.wechatHandle}
       </button>
 
       {open && (
         <div
           ref={popoverRef}
           role="dialog"
-          aria-label={copy.wechatModal.title}
+          aria-label={t.wechatModal.title}
           className="absolute left-0 bottom-[calc(100%+12px)] z-20 bg-white border border-rule rounded-lg p-4 shadow-[0_8px_24px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.06)] min-w-[212px] text-center"
         >
           <div className="mx-auto w-[180px] h-[180px] relative">
             <Image
               src="/images/wechat-qr.jpg"
-              alt={copy.wechatModal.title}
+              alt={t.wechatModal.title}
               fill
               sizes="180px"
               className="object-contain"
             />
           </div>
           <p className="mt-3 text-[12px] text-muted">
-            {copy.wechatModal.title}
+            {t.wechatModal.title}
           </p>
           {/* Triangle pointer */}
           <span

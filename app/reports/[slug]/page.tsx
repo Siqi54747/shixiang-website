@@ -58,7 +58,7 @@ export default function ReportDetailPage({ params }: Params) {
   if (!deck) return notFound();
 
   return (
-    <article className="px-6 md:px-24 py-6 md:py-8">
+    <article className="px-6 md:px-24 py-6 md:py-8 max-w-[1600px] mx-auto">
       <Link
         href="/reports"
         className="inline-block text-[14px] text-ink hover:text-crimson transition-colors"
@@ -89,12 +89,12 @@ export default function ReportDetailPage({ params }: Params) {
             roughly match the left column (iframe aspect-video + share
             bar + gap) so a long guide scrolls internally instead of
             stretching the page. The calc mirrors the grid geometry:
-            article horizontal padding 192px (px-24) + grid gap 48px
-            (gap-12) subtracted from 100vw, 2/3 goes to the left column,
-            then 9/16 is the iframe height, plus ~94px for share bar
-            (~80px) and gap (14px). */}
+            article width caps at 1600px (max-w-[1600px]) before the
+            192px padding (px-24) + 48px grid gap (gap-12) come off,
+            2/3 goes to the left column, then 9/16 is the iframe
+            height, plus ~94px for share bar (~80px) and gap (14px). */}
         <aside className="lg:col-span-1 min-w-0">
-          <section className="border-l-2 border-crimson bg-[#F3F1EA] px-6 py-5 flex flex-col gap-3 lg:max-h-[calc((100vw-240px)*0.375+94px)] lg:overflow-y-auto">
+          <section className="border-l-2 border-crimson bg-[#F3F1EA] px-6 py-5 flex flex-col gap-3 lg:max-h-[calc((min(100vw,1600px)-240px)*0.375+94px)] lg:overflow-y-auto">
             <p className="text-[11px] tracking-label uppercase text-meta">
               {copy.reportDetail.introTitle}
             </p>

@@ -3,7 +3,7 @@
   "configurations": [
     {
       "name": "nextdev",
-      "runtimeExecutable": "/opt/homebrew/bin/npx",
+      "runtimeExecutable": "/Users/hannah/.nvm/versions/node/v24.16.0/bin/npx",
       "runtimeArgs": ["next", "dev"],
       "port": 3000
     }

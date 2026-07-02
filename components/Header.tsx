@@ -15,7 +15,7 @@ export function Header() {
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-50 h-[50px] bg-cream/90 backdrop-blur-sm border-b border-rule">
-        <nav className="h-full px-4 md:px-24 flex items-center justify-between">
+        <nav className="h-full px-4 md:px-24 max-w-[1600px] mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center" aria-label={copy.site.name}>
             <Image
               src="/images/logo-horizontal-brand.png"

@@ -1,15 +1,21 @@
 import Link from "next/link";
 import { copy } from "@/content/copy";
-import { getFeaturedDeck, getOtherDecks } from "@/content/decks";
+import { getFeaturedDeck, getOtherDecks, getDeckSubtitle } from "@/content/decks";
+import { getLocale } from "@/lib/locale-server";
 
-export const metadata = {
-  title: `AGI Reports · ${copy.site.name}`,
-  description: copy.site.description,
-};
+export function generateMetadata() {
+  const t = copy[getLocale()];
+  return {
+    title: `AGI Reports · ${t.site.name}`,
+    description: t.site.description,
+  };
+}
 
 export default function ReportsListPage() {
   const featured = getFeaturedDeck();
   const others = getOtherDecks();
+  const locale = getLocale();
+  const t = copy[locale];
 
   return (
     <section className="px-6 md:px-12 lg:px-20 py-8 md:py-10">
@@ -36,16 +42,16 @@ export default function ReportsListPage() {
               />
               <div className="relative h-full flex flex-col justify-end px-8 md:px-10 py-8 md:py-10">
                 <p className="text-[11px] tracking-label uppercase text-cream/70">
-                  {featured.quarter} · {copy.reportsList.featuredEyebrow}
+                  {featured.quarter} · {t.reportsList.featuredEyebrow}
                 </p>
                 <h2 className="font-serif text-[32px] md:text-[44px] leading-[1.05] mt-3 md:mt-4">
                   {featured.title}
                 </h2>
                 <p className="font-serif text-[16px] md:text-[20px] text-cream/80 mt-3 md:mt-4">
-                  {featured.subtitle}
+                  {getDeckSubtitle(featured, locale)}
                 </p>
                 <span className="inline-block self-start mt-5 md:mt-6 text-[14px] border-b border-cream pb-[4px] group-hover:border-crimson group-hover:text-crimson transition-colors">
-                  {copy.reportsList.featuredCta}
+                  {t.reportsList.featuredCta}
                 </span>
               </div>
             </Link>
@@ -69,7 +75,9 @@ export default function ReportsListPage() {
                     <h3 className="font-serif text-[22px] md:text-[26px] text-ink mt-2 group-hover:text-crimson transition-colors">
                       {deck.title}
                     </h3>
-                    <p className="text-[14px] text-muted mt-2">{deck.subtitle}</p>
+                    <p className="text-[14px] text-muted mt-2">
+                      {getDeckSubtitle(deck, locale)}
+                    </p>
                   </Link>
                 </li>
               );
@@ -83,12 +91,14 @@ export default function ReportsListPage() {
                   <p className="text-[11px] tracking-label uppercase text-meta">
                     <span>{deck.quarter}</span>
                     <span className="mx-2 text-rule">·</span>
-                    <span className="text-crimson">Coming Soon</span>
+                    <span className="text-crimson">{t.reportsList.comingSoon}</span>
                   </p>
                   <h3 className="font-serif text-[22px] md:text-[26px] text-ink mt-2">
                     {deck.title}
                   </h3>
-                  <p className="text-[14px] text-muted mt-2">{deck.subtitle}</p>
+                  <p className="text-[14px] text-muted mt-2">
+                    {getDeckSubtitle(deck, locale)}
+                  </p>
                 </div>
               </li>
             );

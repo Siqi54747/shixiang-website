@@ -2,16 +2,19 @@ import Link from "next/link";
 import { copy } from "@/content/copy";
 import { ThesisWindow } from "@/components/ThesisWindow";
 import { getFeaturedDeck } from "@/content/decks";
+import { getLocale } from "@/lib/locale-server";
 
 export default function Home() {
   const featured = getFeaturedDeck();
-  const headline = copy.hero.headline.replace(/\.$/, "");
+  const locale = getLocale();
+  const t = copy[locale];
+  const headline = t.hero.headline.replace(/\.$/, "");
 
   return (
     <>
       <section className="px-6 md:px-24 pt-10 md:pt-14 pb-10 md:pb-14 max-w-[1600px] mx-auto">
         <p className="font-display text-crimson text-[14px] tracking-eyebrow uppercase">
-          {copy.hero.eyebrow}
+          {t.hero.eyebrow}
         </p>
 
         <div className="mt-11 flex flex-col gap-[15px]">
@@ -20,12 +23,12 @@ export default function Home() {
             <span className="text-crimson">.</span>
           </h1>
           <p className="font-serif text-[32px] md:text-[42px] lg:text-[52px] leading-[1.2] text-muted">
-            {copy.hero.subline}
+            {t.hero.subline}
           </p>
         </div>
 
         <div className="mt-8 md:mt-10 flex flex-col gap-[6px] text-[16px] md:text-[17px] leading-[1.75] text-ink max-w-[760px]">
-          {copy.hero.intro.map((p, i) => (
+          {t.hero.intro.map((p, i) => (
             <p key={i}>{p}</p>
           ))}
         </div>
@@ -36,7 +39,7 @@ export default function Home() {
               href={`/reports/${featured.slug}`}
               className="inline-flex items-center pb-1 text-[16px] md:text-[17px] text-ink w-fit whitespace-pre hover:underline hover:decoration-crimson hover:underline-offset-4"
             >
-              {copy.hero.cta}
+              {t.hero.cta}
             </Link>
           ) : (
             <span className="text-[14px] text-meta">No reports yet</span>
@@ -45,7 +48,7 @@ export default function Home() {
       </section>
 
       <section className="px-6 md:px-24 pb-14 md:pb-20 max-w-[1600px] mx-auto">
-        <ThesisWindow />
+        <ThesisWindow locale={locale} />
       </section>
     </>
   );

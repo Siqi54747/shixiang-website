@@ -28,6 +28,11 @@ import { resolve } from "node:path";
 import { getDeckBySlug } from "@/content/decks";
 import { copy } from "@/content/copy";
 
+// OG cards are shared across locales (no per-locale URL), so they use
+// the default 中文 tree. Localizing the share image would need a ?lang
+// query param threaded through every share link — not worth it yet.
+const t = copy.zh;
+
 export const runtime = "nodejs";
 // Cached at the edge by Next/Vercel; generated once per unique URL.
 export const revalidate = 3600;
@@ -52,7 +57,7 @@ function resolveContent(slug: string | null): OgContent {
     const deck = getDeckBySlug(slug);
     if (deck) {
       return {
-        eyebrow: `${deck.quarter.toUpperCase()} · ${copy.reportsList.featuredEyebrow.toUpperCase()}`,
+        eyebrow: `${deck.quarter.toUpperCase()} · ${t.reportsList.featuredEyebrow.toUpperCase()}`,
         title: deck.title,
         subtitle: deck.subtitle,
       };
@@ -60,9 +65,9 @@ function resolveContent(slug: string | null): OgContent {
   }
   // Fallback — homepage / unknown slug
   return {
-    eyebrow: copy.site.name.toUpperCase(),
-    title: copy.site.tagline,
-    subtitle: copy.site.description,
+    eyebrow: t.site.name.toUpperCase(),
+    title: t.site.tagline,
+    subtitle: t.site.description,
   };
 }
 

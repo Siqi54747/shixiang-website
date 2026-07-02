@@ -1,7 +1,10 @@
+import type { Locale } from "@/lib/i18n";
+
 export interface Deck {
   slug: string;
   title: string;        // English主标题
   subtitle: string;     // 中文副标题
+  subtitleEn?: string;  // 英文副标题。英文模式下优先用；留空回退到 subtitle。由 sync 脚本跨同步保留（见 scripts/sync-decks-from-base.ts）。
   quarter: string;      // e.g. "2026 Q1"
   publishedDate: string; // ISO "YYYY-MM-DD"
   embedUrl: string;     // iframe-able preview URL (sync 脚本会归一成 Google Drive /preview 格式); 空字符串 = 未填
@@ -10,6 +13,7 @@ export interface Deck {
   status: "draft" | "published";
   relatedSlugs?: string[];
   intro?: string[];     // 右栏 Reading Guide 段落（运营产出），每段一个字符串；undefined = 显示占位文案
+  introEn?: string[];   // 英文 Reading Guide 段落。英文模式下优先用；留空回退到 intro。由 sync 脚本跨同步保留。
   cover?: string;       // 封面图本地路径 (e.g. "/covers/agi-landscape.jpg")，由 sync 脚本从 Base 附件下载生成。仅 featured deck 会渲染。
   summary?: string;     // 可选 SEO meta description override。留空时 generateMetadata 回退到 intro[0]，再回退到 subtitle。建议 ≤150 字符。
 }
@@ -35,6 +39,7 @@ export const decks: Deck[] = [
     slug: "the-new-agi-landscape-2026-q1",
     title: "The New AGI Landscape",
     subtitle: "2026 全球 AGI 赛道全景梳理",
+    subtitleEn: "A panoramic map of the global AGI landscape in 2026",
     quarter: "2026 Q1",
     publishedDate: "2026-04-01",
     embedUrl: "https://drive.google.com/file/d/1TdbkYJxK32VgP4yAPnfKOKaszrGOYxK1/preview",
@@ -46,6 +51,11 @@ export const decks: Deck[] = [
       "我们重点关注三条主线：Coding 能力加速向自主 Agent 演进、战略组织与文化如何决定第二增长曲线、智能通缩在下游应用层的兑现节奏。",
       "数据截止 2026 年 3 月，覆盖样本超过 200 家公司。建议先看第 12–18 页的市场结构图和第 30–36 页的投资地图，再回头读完整论述。",
     ],
+    introEn: [
+      "This report maps the key shifts across the global AGI landscape in Q1 2026, covering how leading labs — OpenAI, Anthropic, Google DeepMind and others — are moving across three dimensions: models, products, and organization.",
+      "We focus on three throughlines: coding capability accelerating toward autonomous agents; how strategy, organization, and culture determine the second growth curve; and the pace at which intelligence deflation cashes out in the downstream application layer.",
+      "Data is current through March 2026, covering a sample of over 200 companies. We suggest starting with the market-structure charts on pages 12–18 and the investment map on pages 30–36 before reading the full analysis.",
+    ],
     cover: "/covers/the-new-agi-landscape-2026-q1.png",
     summary: "战略组织与文化如何决定第二增长曲线",
   },
@@ -53,6 +63,7 @@ export const decks: Deck[] = [
     slug: "How-to-play-ai-beta",
     title: "How To Play AI Beta",
     subtitle: "分清结构性机会与噪音",
+    subtitleEn: "Separating structural opportunity from noise",
     quarter: "2025 Q4",
     publishedDate: "2026-02-02",
     embedUrl: "https://drive.google.com/file/d/1EliRn7QLPDRTuCt1xvsQQlu0ZqqNjTKk/preview",
@@ -69,12 +80,23 @@ export const decks: Deck[] = [
       "5. 一个理想的 AGI Basket：Google，Nvidia，OpenAI，Anthropic，ByteDance 和 TSMC；",
       "6. 模型即产品，数据即模型，阶跃式的产品体验提升往往还是来自于底层的模型换代，模型能力提升背后仍是数据 bet。",
     ],
+    introEn: [
+      "The pace of change and structural evolution in AI is always faster than the market imagines — consensus and narrative flip almost every month.",
+      "This report is the Shixiang team's systematic review of these shifts, recalibrating our read on the current AI competitive landscape and unpacking the core technology and product trends that may become the main storylines of 2026:",
+      "1. Google is back at the top of the narrative, but AI is not a zero-sum game — OpenAI and Anthropic still hold strong odds of winning;",
+      "2. Continual learning has become the new paradigm consensus that nearly every AI lab is betting on; 2026 will bring fresh signals;",
+      "3. The AGI race resembles autonomous driving: going from L3 to full L4 is extremely hard, yet in vertical, knowledge-work domains, partial L3/L4 has already delivered meaningful efficiency gains and economic value;",
+      "4. The \"NVIDIA + OpenAI\" throughline may be underestimated by the market in the short term; to keep betting on OpenAI today is to bet on \"something never seen\" in the AI era;",
+      "5. An ideal AGI basket: Google, Nvidia, OpenAI, Anthropic, ByteDance, and TSMC;",
+      "6. The model is the product and data is the model — step-change product experiences still come from underlying model upgrades, and behind rising model capability is, ultimately, a bet on data.",
+    ],
     summary: "模型即产品，数据即模型",
   },
   {
     slug: "agi-notes-2025-q2",
     title: "Road to AGI L4",
     subtitle: "分化与收敛、全家桶、Full Stack",
+    subtitleEn: "Divergence and convergence, the full suite, and full stack",
     quarter: "2025 Q3",
     publishedDate: "2025-08-14",
     embedUrl: "https://drive.google.com/file/d/19Wb_D6-MmVwUScVUXFi7LPAILImtkLS6/preview",
@@ -90,12 +112,22 @@ export const decks: Deck[] = [
       "5. Google 被严重低估,ChatGPT 和 Google 最终会殊途同归,Google AIO 在 AI Ads 上的探索比 Perplexity / ChatGPT 走得更深,Gemini 的后劲可能才是最强的;",
       "6. 做 AI 产品很像\"挖矿\",且有明确的时间保鲜窗口:第一个做出让用户惊叹的 Magic Moment,等于拿到 5 亿美金的免费营销;AI 创业范式正在变,每一次科技浪潮都会诞生新的 Native 基金,30 倍 DPI 的机会留给围绕主线找非共识的人。",
     ],
+    introEn: [
+      "Over the past quarter, AI competition shifted from \"whose model is stronger\" to \"whose playbook is right.\" The leaders are like an F1 race — one wrong turn and you can fall behind — while in places Agents have already reached an L4-level experience:",
+      "1. Models are diverging; no one wins by default, let alone coasts. Today's SOTA is the market average in 3–6 months, and the leaders are like an F1 race where a single mistake can knock you out of contention;",
+      "2. AI Labs are taking two paths: horizontal full suites (ChatGPT = the MS Office of the AI era) and vertical full-stack integration (Google's TPU + Gemini + installed-base scenarios). Foundation-model companies all have to nail Agents end-to-end; a pure-API business has too thin a moat;",
+      "3. Agents have reached an L4-level experience — ChatGPT Deep Research and Claude Code are two examples. Once the Coding Agent pattern works, it keeps expanding into other AI Workspace domains;",
+      "4. Anthropic going all-in on coding is the biggest blow to Cursor. Coding ability is a subset of foundation-model ability; Cursor wants to reshape the data distribution downstream, but its model-training capability simply can't keep up, and that will ultimately show in the user experience;",
+      "5. Google is severely underestimated. ChatGPT and Google will ultimately converge; Google AIO's exploration of AI Ads runs deeper than Perplexity / ChatGPT, and Gemini's staying power may be the strongest of all;",
+      "6. Building AI products is a lot like \"mining,\" with a clear freshness window: being first to create a Magic Moment that wows users is worth $500M in free marketing. The AI startup paradigm is changing — every tech wave births a new Native fund, and the 30x-DPI opportunities go to those who find the non-consensus around the main line.",
+    ],
     summary: "Agent 在局部已经跑出 L4 级别的体验",
   },
   {
     slug: "agi-road-map-2025",
     title: "AGI Road Map 2025",
     subtitle: "智能进步是最大的确定性",
+    subtitleEn: "Progress in intelligence is the greatest certainty",
     quarter: "2025 Q2",
     publishedDate: "2025-05-14",
     embedUrl: "https://drive.google.com/file/d/1_H_PiCGUXGu40cud43kAUjaTFcCgCZJr/preview",
@@ -111,6 +143,16 @@ export const decks: Deck[] = [
       "4. OpenAI 和 Anthropic 的领先优势极其恐怖,两家已拿走近 80% 的 LLM 产品营收。Anthropic 在做“Android”，OpenAI 在做“Apple”，LLM OS 的两种形态正在成形；",
       "5. Online Learning 是下一个范式级路线,允许模型自主探索并学习，reward model 设计会是新的关键卡点；",
       "6. Coding + Agentic AI 是 AGI 时代抖音和微信级别的机会：第一幕把软件供给放大 100x，第二幕实现 Task Engine,把市场从 5000 万开发者拓展到 10 亿知识工作者。",
+    ],
+    introEn: [
+      "In an uncertain 2025, technological progress is paradoxically the greatest certainty in AI investing. There is really only one throughline worth a long-term bet: the advance of intelligence itself.",
+      "This report is the Shixiang team's systematic review of the 2025 AGI main line — aiming to find the greatest certainty in a turbulent environment and to identify the technology and product opportunities most worth betting on in 2025:",
+      "1. Intelligence itself is the biggest application; the only main line for investing in AGI is to allocate around \"rising intelligence.\" We are moving from L2 Reasoners toward L3 Agents, and each step up unlocks entirely new intelligence scenarios;",
+      "2. The biggest non-consensus today is that there is still vast room in pre-training: only pre-training makes new capabilities emerge, while RL + post-training maximizes existing potential without creating new capabilities — the next SOTA will still significantly beat today's;",
+      "3. AGI roadmaps are diverging: OpenAI bets on O-series reasoning + a billion-DAU killer app, Anthropic bets on a pre-training base model + Coding → Agentic AI — at heart, a \"traffic vs. intelligence\" contest of routes;",
+      "4. OpenAI's and Anthropic's lead is staggering — together they already take nearly 80% of LLM product revenue. Anthropic is building \"Android\" while OpenAI builds \"Apple\"; two forms of the LLM OS are taking shape;",
+      "5. Online Learning is the next paradigm-level route, letting models explore and learn autonomously; reward-model design will be the new critical bottleneck;",
+      "6. Coding + Agentic AI is the Douyin/WeChat-scale opportunity of the AGI era: Act One amplifies software supply 100x, and Act Two delivers a Task Engine, expanding the market from 50 million developers to a billion knowledge workers.",
     ],
     summary: "大模型在分化",
   },
@@ -144,6 +186,21 @@ export function getOtherDecks(): Deck[] {
 
 export function getDeckBySlug(slug: string): Deck | undefined {
   return getPublishedDecks().find((d) => d.slug === slug);
+}
+
+/**
+ * Locale-aware deck content pickers. English falls back to the Chinese
+ * source whenever the parallel `subtitleEn` / `introEn` is missing
+ * (e.g. a freshly-published deck whose English hasn't been added yet),
+ * so the page never renders blank in English mode.
+ */
+export function getDeckSubtitle(deck: Deck, locale: Locale): string {
+  return locale === "en" ? deck.subtitleEn || deck.subtitle : deck.subtitle;
+}
+
+export function getDeckIntro(deck: Deck, locale: Locale): string[] | undefined {
+  if (locale === "en") return deck.introEn ?? deck.intro;
+  return deck.intro;
 }
 
 /**

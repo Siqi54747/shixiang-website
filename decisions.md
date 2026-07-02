@@ -446,3 +446,31 @@ Reports 场景不同:
 - `content/copy.ts` 的 `site.url`、`contactEmail`,以及 `app/api/og/route.tsx` 的 OG 图签名仍是旧域名,需逐处确认后更新(canonical / OG 应指向新主域名)
 - 对外物料(微信菜单 / 名片 / LP 材料 / email 签名 / 微博 bio)同步换到 `shixiang.com`,参考 `docs/site-ops-runbook.md`
 
+
+---
+
+## 2026-06-30: 全站中英双语（默认中文，原地切换）
+
+### 决策
+
+全站支持中 / EN 双语，默认中文，访客可在 header 右上角 **中 / EN** toggle 切换。**原地切换**，不走 `/en` 路由前缀。
+
+### 选型
+
+- **原地切换 (cookie + RSC re-render)，不用 `/en` 子路径**：语言存 `lang` cookie（默认 zh），server component 读 cookie 决定语言；toggle 写 cookie + `router.refresh()` 让 server 端重渲染整页（chrome + deck 内容），无中→英闪烁。代价：所有页面读 `cookies()` 后变 dynamic render（低流量站可接受；爬虫无 cookie 看到的是默认中文，主 SEO 不受影响）。
+  - 否决 `/en` 路由前缀：对小型 content hub 过重，每个 route 都要改；shareable 英文 URL / 独立 SEO 当前阶段非目标。Siqi 明确选「更简单」。
+- **UI 文案**：`content/copy.ts` 从扁平对象重构成 `{ zh, en }`，`en: CopyTree` 由 `typeof zh` 类型约束两边 key 一致。Server 端 `copy[getLocale()]`，client 端 `copy[useLocale()]`（`components/LocaleProvider` context，值由 root layout 从 cookie 注入）。
+- **报告内容**：`Deck` 加可选 `subtitleEn` / `introEn`，英文模式优先用、缺失回退中文（`getDeckSubtitle` / `getDeckIntro`）。英文由我在 repo 内翻译维护（方案 A），**不在飞书 Base 编辑**。
+  - `scripts/sync-decks-from-base.ts` 改为跨同步保留英文：overwrite 前 `import()` 现有 `content/decks.ts` 按 slug 取回 `subtitleEn`/`introEn` 回填；若 Base 日后加 `Subtitle (EN)` / `Intro (EN)` 列则 Base 优先。**否则 sync 会把手写英文冲掉**。
+- **OG 图**：共用默认中文（`copy.zh`），无 per-locale URL 不值得为分享图加 `?lang`。
+- **Thesis terminal entries**：站内 desc/sub 翻了英文，但 `href` 仍指中文公众号原文（外链无法翻译）。
+
+### 关键不变量
+
+- 新增任何走 `copy` 的 UI 文案，必须同时填 `zh` 和 `en`（类型会报错提醒）。
+- 新发布的 deck 若没补 `subtitleEn`/`introEn`，英文模式会回退显示中文——不是 bug，是 graceful fallback。
+- 改 deck 英文请直接改 `content/decks.ts`（sync 会保留），不要指望飞书。
+
+### 本地验证踩的坑
+
+本机 `next dev` 首次编译每个 route 极慢（iCloud 同步目录 + `next/font/google` 下载大体积 CJK 字体 Noto Sans/Serif SC，反复 `Retrying 1/3 … user aborted`）。**字体下载完成后才会出首屏**，第一个 route 编完字体缓存，后续 route 就快了。与 `next build` jest-worker 死锁、`/api/og` 本机卡死同源，都是本机环境限制，非代码问题。

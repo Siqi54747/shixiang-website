@@ -1,4 +1,5 @@
 import { copy } from "@/content/copy";
+import type { Locale } from "@/lib/i18n";
 import styles from "./ThesisWindow.module.css";
 
 const MONTH_LABELS = [
@@ -17,7 +18,8 @@ const MONTH_LABELS = [
  * UPDATED month/year is injected at module init (build time for SSG),
  * so each production deploy carries the month of its build.
  */
-export function ThesisWindow() {
+export function ThesisWindow({ locale }: { locale: Locale }) {
+  const t = copy[locale].thesis;
   const now = new Date();
   const month = MONTH_LABELS[now.getMonth()];
   const year = now.getFullYear();
@@ -35,20 +37,20 @@ export function ThesisWindow() {
           <span className={`${styles.dot} ${styles.dotAmber}`} />
           <span className={`${styles.dot} ${styles.dotGreen}`} />
         </div>
-        <span className={styles.filename}>{copy.thesis.filename}</span>
+        <span className={styles.filename}>{t.filename}</span>
         <span className={styles.meta}>
-          {copy.thesis.updatedLabel} {month} {year}
+          {t.updatedLabel} {month} {year}
         </span>
       </header>
 
       {/* Main — `$ cat thesis.md` + 4 thesis entries */}
       <main className={styles.content}>
         <div className={styles.commandEcho} aria-hidden="true">
-          {copy.thesis.command}
+          {t.command}
         </div>
 
         <ul className={styles.list} role="list">
-          {copy.thesis.entries.map((entry, idx) => (
+          {t.entries.map((entry, idx) => (
             <li
               key={entry.slug}
               className={styles.entry}
@@ -82,7 +84,7 @@ export function ThesisWindow() {
         <div className={styles.statusLeft}>
           <span className={styles.branch}>
             <span className={styles.branchIcon} aria-hidden="true">⌥</span>
-            <span>{copy.thesis.branch}</span>
+            <span>{t.branch}</span>
           </span>
           <span className={styles.separator} aria-hidden="true">·</span>
           <span className={styles.date}>{year}</span>
@@ -93,7 +95,7 @@ export function ThesisWindow() {
           aria-label="System status: ready"
         >
           <span className={styles.readyDot} aria-hidden="true" />
-          <span>{copy.thesis.ready}</span>
+          <span>{t.ready}</span>
         </div>
       </footer>
     </section>

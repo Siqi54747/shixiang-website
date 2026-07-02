@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { copy } from "@/content/copy";
+import { useLocale } from "./LocaleProvider";
 
 interface ShareBarProps {
   title: string;
@@ -10,6 +11,7 @@ interface ShareBarProps {
 export function ShareBar({ title }: ShareBarProps) {
   const [linkCopied, setLinkCopied] = useState(false);
   const [wechatToast, setWechatToast] = useState(false);
+  const t = copy[useLocale()].reportDetail;
 
   const copyLink = async () => {
     try {
@@ -49,7 +51,7 @@ export function ShareBar({ title }: ShareBarProps) {
   return (
     <div className="flex flex-col items-center gap-3">
       <p className="text-[11px] tracking-label uppercase text-meta">
-        {copy.reportDetail.shareTitle}
+        {t.shareTitle}
       </p>
       <div className="flex items-center gap-3 text-[14px] text-ink">
         <button
@@ -57,7 +59,7 @@ export function ShareBar({ title }: ShareBarProps) {
           className="hover:text-crimson transition-colors"
           onClick={handleWechat}
         >
-          {copy.reportDetail.shareWechat}
+          {t.shareWechat}
         </button>
         <span className="text-rule">|</span>
         <button
@@ -65,7 +67,7 @@ export function ShareBar({ title }: ShareBarProps) {
           className="hover:text-crimson transition-colors"
           onClick={handleTwitter}
         >
-          {copy.reportDetail.shareTwitter}
+          {t.shareTwitter}
         </button>
         <span className="text-rule">|</span>
         <button
@@ -73,7 +75,7 @@ export function ShareBar({ title }: ShareBarProps) {
           className="hover:text-crimson transition-colors"
           onClick={handleCopyLink}
         >
-          {linkCopied ? copy.reportDetail.shareCopied : copy.reportDetail.shareCopyLink}
+          {linkCopied ? t.shareCopied : t.shareCopyLink}
         </button>
       </div>
       <p
@@ -82,7 +84,7 @@ export function ShareBar({ title }: ShareBarProps) {
           wechatToast ? "opacity-100" : "opacity-0"
         }`}
       >
-        {copy.reportDetail.shareWechatToast}
+        {t.shareWechatToast}
       </p>
     </div>
   );

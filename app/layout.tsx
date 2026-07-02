@@ -9,7 +9,10 @@ import {
 import { Analytics } from "@vercel/analytics/react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { LocaleProvider } from "@/components/LocaleProvider";
 import { copy } from "@/content/copy";
+import { getLocale } from "@/lib/locale-server";
+import { htmlLang } from "@/lib/i18n";
 import "./globals.css";
 
 // Self-hosted via next/font/google so the browser doesn't block on a
@@ -65,34 +68,40 @@ const fontVars = [
   notoSerifSC.variable,
 ].join(" ");
 
-export const metadata: Metadata = {
-  title: `${copy.site.name} · ${copy.site.tagline}`,
-  description: copy.site.description,
-  openGraph: {
-    title: `${copy.site.name} · ${copy.site.tagline}`,
-    description: copy.site.description,
-    images: [{ url: "/api/og", width: 1200, height: 630, alt: copy.site.name }],
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `${copy.site.name} · ${copy.site.tagline}`,
-    description: copy.site.description,
-    images: ["/api/og"],
-  },
-};
+export function generateMetadata(): Metadata {
+  const t = copy[getLocale()];
+  return {
+    title: `${t.site.name} · ${t.site.tagline}`,
+    description: t.site.description,
+    openGraph: {
+      title: `${t.site.name} · ${t.site.tagline}`,
+      description: t.site.description,
+      images: [{ url: "/api/og", width: 1200, height: 630, alt: t.site.name }],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${t.site.name} · ${t.site.tagline}`,
+      description: t.site.description,
+      images: ["/api/og"],
+    },
+  };
+}
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = getLocale();
   return (
-    <html lang="zh-CN" className={fontVars}>
+    <html lang={htmlLang(locale)} className={fontVars}>
       <body className="font-sans antialiased text-ink bg-cream min-h-screen flex flex-col">
-        <Header />
-        <main className="pt-[50px] flex-1">{children}</main>
-        <Footer />
+        <LocaleProvider locale={locale}>
+          <Header />
+          <main className="pt-[50px] flex-1">{children}</main>
+          <Footer />
+        </LocaleProvider>
         <Analytics />
       </body>
     </html>

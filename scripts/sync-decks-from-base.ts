@@ -46,6 +46,7 @@
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 
 // ----- env ---------------------------------------------------------------
 
@@ -382,6 +383,7 @@ interface Deck {
   slug: string;
   title: string;
   subtitle: string;
+  subtitleEn?: string;
   quarter: string;
   publishedDate: string;
   embedUrl: string;
@@ -390,6 +392,7 @@ interface Deck {
   status: "draft" | "published";
   relatedSlugs?: string[];
   intro?: string[];
+  introEn?: string[];
   cover?: string;
   summary?: string;
 }
@@ -400,6 +403,12 @@ const COL = {
   slug: "Slug",
   title: "Title (EN)",
   subtitle: "Subtitle (CN)",
+  // Optional English columns. They don't exist in the Base yet (the
+  // English copy is currently authored in-repo and preserved across
+  // syncs — see mergePreservedEnglish below). If 运营 later adds these
+  // columns in Base, the sync will start pulling them automatically and
+  // Base wins over the preserved in-repo value.
+  subtitleEn: "Subtitle (EN)",
   quarter: "Quarter",
   publishedDate: "Published Date",
   embedUrl: "Embed URL",
@@ -408,6 +417,7 @@ const COL = {
   status: "Status",
   relatedSlugs: "Related Slugs",
   intro: "Intro",
+  introEn: "Intro (EN)",
   cover: "Cover",
   summary: "Summary",
 } as const;
@@ -418,11 +428,17 @@ function recordToDeck(record: BaseRecord): Deck {
   const relatedSlugs = readCommaList(f[COL.relatedSlugs]);
   const summary = readText(f[COL.summary]).trim();
   const embedUrlCn = readUrl(f[COL.embedUrlCn]).trim();
+  const subtitleEn = readText(f[COL.subtitleEn]).trim();
+  const introEn = readParagraphs(f[COL.introEn]);
 
   return {
     slug: readText(f[COL.slug]).trim(),
     title: readText(f[COL.title]).trim(),
     subtitle: readText(f[COL.subtitle]).trim(),
+    // English subtitle/intro: pulled from Base when those columns exist,
+    // otherwise left undefined here and refilled from the existing
+    // content/decks.ts by mergePreservedEnglish().
+    ...(subtitleEn ? { subtitleEn } : {}),
     quarter: readText(f[COL.quarter]).trim(),
     publishedDate: readIsoDate(f[COL.publishedDate]),
     embedUrl: normalizeDriveUrl(readUrl(f[COL.embedUrl])),
@@ -435,8 +451,46 @@ function recordToDeck(record: BaseRecord): Deck {
     status: status === "draft" ? "draft" : "published",
     ...(relatedSlugs.length > 0 ? { relatedSlugs } : {}),
     intro: readParagraphs(f[COL.intro]),
+    ...(introEn ? { introEn } : {}),
     ...(summary ? { summary } : {}),
   };
+}
+
+/**
+ * Re-attach English copy that lives only in the repo.
+ *
+ * The English subtitle/reading guide are authored in content/decks.ts
+ * (not in 飞书 Base), so a naive overwrite would wipe them on every
+ * sync. Before serializing, we import the *current* decks.ts and, for
+ * each deck matched by slug, keep its `subtitleEn` / `introEn` unless
+ * the incoming Base record already supplied one (Base wins, so 运营 can
+ * migrate the English into Base later without code changes).
+ *
+ * Failure to read the previous file (first run, parse error) is
+ * non-fatal: we log and proceed, leaving English to be re-added by hand.
+ */
+async function mergePreservedEnglish(decks: Deck[]): Promise<void> {
+  let prev: Deck[];
+  try {
+    const mod = (await import(
+      pathToFileURL(resolve("content/decks.ts")).href
+    )) as { decks?: Deck[] };
+    prev = mod.decks ?? [];
+  } catch (err) {
+    console.warn(
+      `[sync-decks] could not read existing English copy from content/decks.ts (${
+        err instanceof Error ? err.message : err
+      }); English fields will be dropped for decks not carrying them in Base.`
+    );
+    return;
+  }
+  const bySlug = new Map(prev.map((d) => [d.slug, d]));
+  for (const deck of decks) {
+    const old = bySlug.get(deck.slug);
+    if (!old) continue;
+    if (!deck.subtitleEn && old.subtitleEn) deck.subtitleEn = old.subtitleEn;
+    if (!deck.introEn && old.introEn) deck.introEn = old.introEn;
+  }
 }
 
 function validateDecks(decks: Deck[]): void {
@@ -475,6 +529,7 @@ function serialize(decks: Deck[]): string {
     lines.push(`    slug: ${q(d.slug)},`);
     lines.push(`    title: ${q(d.title)},`);
     lines.push(`    subtitle: ${q(d.subtitle)},`);
+    if (d.subtitleEn) lines.push(`    subtitleEn: ${q(d.subtitleEn)},`);
     lines.push(`    quarter: ${q(d.quarter)},`);
     lines.push(`    publishedDate: ${q(d.publishedDate)},`);
     lines.push(`    embedUrl: ${q(d.embedUrl)},`);
@@ -489,6 +544,11 @@ function serialize(decks: Deck[]): string {
     if (d.intro && d.intro.length > 0) {
       lines.push(`    intro: [`);
       for (const p of d.intro) lines.push(`      ${q(p)},`);
+      lines.push(`    ],`);
+    }
+    if (d.introEn && d.introEn.length > 0) {
+      lines.push(`    introEn: [`);
+      for (const p of d.introEn) lines.push(`      ${q(p)},`);
       lines.push(`    ],`);
     }
     if (d.cover) lines.push(`    cover: ${q(d.cover)},`);
@@ -553,6 +613,10 @@ async function main(): Promise<void> {
       );
     }
   }
+
+  // Re-attach in-repo English copy (subtitleEn / introEn) that the Base
+  // doesn't carry yet, so this overwrite doesn't wipe it.
+  await mergePreservedEnglish(decks);
 
   // Sort newest first — matches getPublishedDecks() default ordering
   decks.sort((a, b) => (a.publishedDate < b.publishedDate ? 1 : -1));
